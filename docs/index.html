@@ -126,14 +126,21 @@
           <div class="code-grid">
             <article>
               <h3>Install from GitHub</h3>
-              <pre><code>pip install "fps-uda[vision,hf] @ git+https://github.com/baogegeJiang/FPS.git"</code></pre>
+              <pre><code>pip install "fps-uda @ git+https://github.com/baogegeJiang/FPS.git"</code></pre>
               <p>
                 Clone the repository instead when you want the packaged H5
-                example file and editable development mode.
+                example file and editable development mode. Add extras only for
+                the workflows you use.
               </p>
               <pre><code>git clone https://github.com/baogegeJiang/FPS.git
 cd FPS
-pip install -e ".[vision,hf,dev]"</code></pre>
+pip install -e ".[dev]"
+
+# optional: image feature extraction
+pip install -e ".[vision]"
+
+# optional: released bank download
+pip install -e ".[hf]"</code></pre>
             </article>
             <article>
               <h3>Smoke run</h3>

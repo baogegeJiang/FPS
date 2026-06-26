@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -43,16 +43,22 @@ Paper = "https://ieeexplore.ieee.org/abstract/document/11568428"
 vision = [
   "torchvision",
   "timm",
-  "transformers",
   "pillow",
-  "rasterio",
-  "easydict",
 ]
 analysis = [
   "matplotlib",
 ]
 hf = [
+  "huggingface_hub",
+]
+hf-fast = [
   "huggingface_hub[hf_xet]",
+]
+transformers = [
+  "transformers",
+]
+geo = [
+  "rasterio",
 ]
 dev = [
   "pytest",

@@ -96,7 +96,8 @@ def import_hf_download():
         raise SystemExit(
             "Missing dependency 'huggingface_hub'. Install it with one of:\n"
             '  pip install -e ".[hf]"\n'
-            '  pip install "huggingface_hub[hf_xet]"'
+            '  pip install "huggingface_hub"\n'
+            'Use pip install -e ".[hf-fast]" only when you want the optional hf_xet downloader.'
         ) from exc
     return hf_hub_download
 

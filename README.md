@@ -70,16 +70,16 @@ This open-source library includes code contributions from:
 
 ## Install
 
-For local development:
+For the fastest install, use the base package first:
 
 ```bash
-pip install -e ".[dev]"
+pip install -e .
 ```
 
 Install directly from GitHub:
 
 ```bash
-pip install "fps-uda[vision,hf] @ git+https://github.com/baogegeJiang/FPS.git"
+pip install "fps-uda @ git+https://github.com/baogegeJiang/FPS.git"
 ```
 
 Or clone the repository when you also want the packaged real-H5 example file:
@@ -87,13 +87,13 @@ Or clone the repository when you also want the packaged real-H5 example file:
 ```bash
 git clone https://github.com/baogegeJiang/FPS.git
 cd FPS
-pip install -e ".[vision,hf,dev]"
+pip install -e ".[dev]"
 ```
 
 Install vision dependencies when extracting features from images:
 
 ```bash
-pip install -e ".[vision,dev]"
+pip install -e ".[vision]"
 ```
 
 Install Hugging Face download support when using released feature banks:
@@ -101,6 +101,15 @@ Install Hugging Face download support when using released feature banks:
 ```bash
 pip install -e ".[hf]"
 ```
+
+Install optional Hugging Face ViT/CLIP backbone support only when needed:
+
+```bash
+pip install -e ".[transformers]"
+```
+
+If you already manage PyTorch and NumPy in your environment, you can skip
+dependency resolution entirely with `pip install -e . --no-deps`.
 
 If you do not install the package, run the CLI module directly from the repo:
 
