@@ -1,0 +1,47 @@
+name: office31_vit
+root_dir: data/office31
+backbone:
+  backend: timm
+  name: vit_base_patch16_224.augreg2_in21k_ft_in1k
+  pretrained: true
+  weights: null
+  checkpoint: null
+  in_features: 768
+  kwargs:
+    class_token: true
+    global_pool: token
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared
+loader:
+  batch_size: 32
+  num_workers: 16
+  seed: 0
+  strong_aug: false
+  distributed: false
+  pin_memory: true
+  drop_last: false
+transform:
+  interpolation: bicubic
+  antialias: true
+  pad_fill: 127
+  mean: [0.5, 0.5, 0.5]
+  std: [0.5, 0.5, 0.5]
+domains:
+  - {name: amazon, kind: manifest, image_root: amazon, manifest: amazon/annotations/annotations.txt, path_column: 0, label_column: 1}
+  - {name: dslr, kind: manifest, image_root: dslr, manifest: dslr/annotations/annotations.txt, path_column: 0, label_column: 1}
+  - {name: webcam, kind: manifest, image_root: webcam, manifest: webcam/annotations/annotations.txt, path_column: 0, label_column: 1}
+feature_bank:
+  water_level: 0.0
+  mute_padding_in_pool: true
+  views:
+    - {key: pad_resize256_input224_tl_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: tl, flip: orig}
+    - {key: pad_resize256_input224_tl_hflip, pad_to_square: true, resize_size: 256, input_size: 224, crop: tl, flip: hflip}
+    - {key: pad_resize256_input224_tr_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: tr, flip: orig}
+    - {key: pad_resize256_input224_tr_hflip, pad_to_square: true, resize_size: 256, input_size: 224, crop: tr, flip: hflip}
+    - {key: pad_resize256_input224_bl_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: bl, flip: orig}
+    - {key: pad_resize256_input224_bl_hflip, pad_to_square: true, resize_size: 256, input_size: 224, crop: bl, flip: hflip}
+    - {key: pad_resize256_input224_br_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: br, flip: orig}
+    - {key: pad_resize256_input224_br_hflip, pad_to_square: true, resize_size: 256, input_size: 224, crop: br, flip: hflip}
+    - {key: pad_resize256_input224_center_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: center, flip: orig}
+    - {key: pad_resize256_input224_center_hflip, pad_to_square: true, resize_size: 256, input_size: 224, crop: center, flip: hflip}

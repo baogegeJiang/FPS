@@ -1,0 +1,36 @@
+name: visda17_resnet
+root_dir: data/visda17
+backbone:
+  backend: torchvision
+  name: resnet101
+  pretrained: true
+  weights: IMAGENET1K_V1
+  checkpoint: null
+  in_features: 2048
+  kwargs: {}
+  pooling:
+    feature_type: spatial
+    random_strategy: spatial_shared
+loader:
+  batch_size: 1024
+  num_workers: 16
+  seed: 515
+  strong_aug: false
+  distributed: false
+  pin_memory: true
+  drop_last: false
+transform:
+  interpolation: bilinear
+  antialias: true
+  pad_fill: 127
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+domains:
+  - {name: train, kind: manifest, image_root: train, manifest: train/image_list.txt, path_column: 0, label_column: 1}
+  - {name: validation, kind: manifest, image_root: validation, manifest: validation/image_list.txt, path_column: 0, label_column: 1}
+feature_bank:
+  water_level: 0.0
+  mute_padding_in_pool: true
+  views:
+    - {key: pad_resize256_input256_direct_orig, pad_to_square: true, resize_size: 256, input_size: 256, crop: direct, flip: orig, random_pooling_count: 4}
+    - {key: pad_resize256_input256_direct_hflip, pad_to_square: true, resize_size: 256, input_size: 256, crop: direct, flip: hflip, random_pooling_count: 4}

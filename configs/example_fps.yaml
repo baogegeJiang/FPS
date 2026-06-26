@@ -1,0 +1,62 @@
+io:
+  feature_bank: fps_h5cache/banks/office31_vit.h5
+  source_domain: amazon
+  target_domain: webcam
+  feature_transform: none
+  num_classes: 31
+  device: cpu
+views:
+  src:
+    key: pad_resize256_input224_center_orig_clean
+    combine: stack
+  entropy:
+    key: pad_resize256_input224_center_orig_clean
+    combine: mean
+  cr:
+    view1:
+      key: pad_resize256_input224_center_orig_pool_a
+      combine: stack
+    view2:
+      key: pad_resize256_input224_center_orig_pool_b
+      combine: stack
+  eval:
+    key: pad_resize256_input224_center_orig_clean
+    combine: mean
+optimization:
+  base_lr: 0.0005
+  optimizer: sgd
+  momentum: 0.9
+  nesterov: false
+  weight_decay: 0.0
+  lr_schedule: linear_step
+  min_lr: 0.0
+schedule:
+  iter_num: 1000
+  alpha: 1.0
+  beta: 0.1
+  alpha_0: 0.1
+  beta_0: 0.1
+  schedule_tau: 1000
+  dynamic_parameters: true
+normalization:
+  normalize: cross_norm
+  cross_norm_scale: 2.5
+  cross_norm_target_weight: 0.5
+losses:
+  use_consistency_loss: true
+  use_classes_weight: true
+  use_lse: true
+  use_lce: true
+  use_lcr: true
+  lambda_lcr: 0.55
+  lcr_loss: mse
+  pseudo_margin: true
+  margin_start_step: 100
+  sample_entropy_type: shannon
+  margin_quantile: 0.15
+  margin_weight_type: normalized_logit_gap
+  margin_convert_mode: quantile_sigmoid
+  margin_sigmoid_tau: 0.2
+  margin_sigmoid_boundary_weight: 0.2
+eval:
+  eval_interval: 100

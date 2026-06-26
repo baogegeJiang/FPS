@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fps-uda"
+version = "0.1.0"
+description = "Feature-space FPS training utilities for unsupervised domain adaptation."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+  { name = "FPS-UDA contributors" },
+]
+keywords = ["domain-adaptation", "pytorch", "feature-space", "unsupervised-learning"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "torch",
+  "numpy",
+  "h5py",
+  "pyyaml",
+  "tqdm",
+  "scikit-learn",
+]
+
+[project.urls]
+Homepage = "https://github.com/baogegeJiang/FPS"
+Repository = "https://github.com/baogegeJiang/FPS"
+Documentation = "https://baogegeJiang.github.io/FPS/"
+Paper = "https://ieeexplore.ieee.org/abstract/document/11568428"
+
+[project.optional-dependencies]
+vision = [
+  "torchvision",
+  "timm",
+  "transformers",
+  "pillow",
+  "rasterio",
+  "easydict",
+]
+analysis = [
+  "matplotlib",
+]
+hf = [
+  "huggingface_hub[hf_xet]",
+]
+dev = [
+  "pytest",
+  "build",
+  "ruff",
+]
+
+[project.scripts]
+fps-uda = "fps_uda.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "real_h5: optional smoke tests that require generated real feature-bank fixtures",
+]

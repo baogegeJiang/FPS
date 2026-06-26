@@ -1,0 +1,75 @@
+io:
+  feature_bank: fps_h5cache/banks/office31_resnet50.h5
+  source_domain: webcam
+  target_domain: amazon
+  feature_transform: sqrt
+  num_classes: 31
+  device: cuda:0
+views:
+  src:
+    key: nopad_resize256_input256_direct_orig_pool_a,nopad_resize256_input256_direct_hflip_pool_a,nopad_resize256_input256_direct_orig_pool_b,nopad_resize256_input256_direct_hflip_pool_b,nopad_resize256_input256_direct_orig_pool_c,nopad_resize256_input256_direct_hflip_pool_c,nopad_resize256_input256_direct_orig_pool_d,nopad_resize256_input256_direct_hflip_pool_d,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_e,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_f,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_g,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_h,
+    combine: mean
+  entropy:
+    key: nopad_resize256_input256_direct_orig_clean,nopad_resize256_input256_direct_hflip_clean
+    combine: stack
+  cr:
+    view1:
+      key: nopad_resize256_input256_direct_orig_pool_a,nopad_resize256_input256_direct_hflip_pool_a,nopad_resize256_input256_direct_orig_pool_b,nopad_resize256_input256_direct_hflip_pool_b,nopad_resize256_input256_direct_orig_pool_c,nopad_resize256_input256_direct_hflip_pool_c,nopad_resize256_input256_direct_orig_pool_d,nopad_resize256_input256_direct_hflip_pool_d,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_e,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_f,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_g,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_h,
+      combine: stack
+    view2:
+      key: nopad_resize256_input256_direct_orig_pool_b,nopad_resize256_input256_direct_hflip_pool_b,nopad_resize256_input256_direct_orig_pool_c,nopad_resize256_input256_direct_hflip_pool_c,nopad_resize256_input256_direct_orig_pool_d,nopad_resize256_input256_direct_hflip_pool_d,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_e,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_f,nopad_resize256_input256_direct_orig_pool_e,nopad_resize256_input256_direct_hflip_pool_g,nopad_resize256_input256_direct_orig_pool_f,nopad_resize256_input256_direct_hflip_pool_h,nopad_resize256_input256_direct_orig_pool_a,nopad_resize256_input256_direct_hflip_pool_a
+      combine: stack
+  eval:
+    key: nopad_resize256_input256_direct_orig_clean,nopad_resize256_input256_direct_hflip_clean
+    combine: mean
+optimization:
+  base_lr: 0.005
+  momentum: 0.9
+  optimizer: sgd
+  nesterov: false
+  weight_decay: 0.0
+  lr_schedule: linear_step
+  min_lr: 0.0
+schedule:
+  seed: 0
+  iter_num: 3000
+  alpha: 0.75
+  beta: 0.65
+  alpha_0: 0.1
+  beta_0: 0.1
+  schedule_tau: 1000
+  dynamic_parameters: true
+normalization:
+  normalize: cross_norm
+  cross_norm_scale: 0.4
+  self_norm_scale_src: 1
+  self_norm_scale_tgt: 1
+losses:
+  use_consistency_loss: true
+  use_correction: false
+  use_shift_constraint: false
+  use_classes_weight: true
+  baseline: false
+  use_lse: true
+  use_lce: true
+  use_lcr: true
+  lambda_lcr: 0.2
+  lcr_loss: mse
+  pseudo_margin: true
+  margin_start_step: 100
+  use_temperature: false
+  begin_temperature: 15
+  use_geom_test: false
+  geom_alpha: 1
+  geom_beta: 1
+  sparse_weight_a: 5
+  sample_entropy_type: shannon
+  margin_quantile: 0.01
+  margin_weight_type: normalized_logit_gap
+  margin_convert_mode: quantile_sigmoid
+  margin_sigmoid_tau: 0.2
+  margin_sigmoid_boundary_weight: 0.2
+eval:
+  multi_class: true
+  eval_interval: 100
+  progress: true

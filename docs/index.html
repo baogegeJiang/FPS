@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FPS-UDA Documentation</title>
+    <meta
+      name="description"
+      content="FPS-UDA: feature-space unsupervised domain adaptation with frozen feature banks, PyTorch training, and configurable CLI workflows."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="#top">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="#paper">Paper</a>
+          <a href="#quick-start">Quick Start</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#config">Config</a>
+          <a href="#api">API</a>
+          <a href="#advanced">Advanced</a>
+          <a href="#citation">Citation</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section-band">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">Feature-space domain adaptation</p>
+            <h1>FPS-UDA trains decision planes over frozen feature banks.</h1>
+            <p class="lead">
+              Build or download dataset-level H5 feature banks, select
+              source/target views, and train Feature-Space Planes Searcher
+              (FPS) from NumPy, Torch, or H5 features.
+            </p>
+            <div class="button-row" aria-label="Primary links">
+              <a class="button primary" href="#quick-start">Run the example</a>
+              <a class="button" href="https://github.com/baogegeJiang/FPS">GitHub</a>
+              <a class="button" href="https://ieeexplore.ieee.org/abstract/document/11568428">Paper</a>
+            </div>
+          </div>
+          <aside class="status-panel" aria-label="Project facts">
+            <img
+              class="group-logo"
+              src="assets/shallow-intelligence-group.png"
+              alt="Shallow Intelligence Group"
+            >
+            <h2>Project</h2>
+            <dl>
+              <div>
+                <dt>Package</dt>
+                <dd><code>fps-uda</code></dd>
+              </div>
+              <div>
+                <dt>Import</dt>
+                <dd><code>fps_uda</code></dd>
+              </div>
+              <div>
+                <dt>License</dt>
+                <dd>MIT</dd>
+              </div>
+              <div>
+                <dt>Pages</dt>
+                <dd><code>baogegeJiang.github.io/FPS</code></dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <section id="paper" class="section">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Paper</p>
+            <h2>Feature-Space Planes Searcher</h2>
+            <p>
+              This repository accompanies
+              <strong>Feature-Space Planes Searcher: A Universal Domain
+              Adaptation Framework for Interpretability and Computational
+              Efficiency</strong>.
+            </p>
+            <p>
+              <a href="https://scholar.google.com/citations?hl=zh-CN&amp;user=T4lifpIAAAAJ">Zhitong Cheng</a>+,
+              <a href="https://scholar.google.com/citations?user=FRCRT-UAAAAJ&amp;hl=zh-CN">Yiran Jiang</a>+,
+              Yulong Ge, Yufeng Li, Zhongheng Qin, Rongzhi Lin, and
+              <a href="https://scholar.google.com/citations?user=6V78tzkAAAAJ&amp;hl=zh-CN">Jianwei Ma</a>*.
+            </p>
+            <p><code>+</code> Equal contribution. <code>*</code> Corresponding author.</p>
+            <p>
+              Release note: this library version simplifies parts of the
+              original image augmentation pipeline, such as random crop and
+              contrast perturbations, to reduce feature-extraction randomness.
+              Random pooling is retained, while image views use deterministic
+              transforms such as five-crop variants. Public benchmark
+              hyperparameters were re-searched for these released feature banks.
+              The experiment code was also reorganized into a modular library
+              structure for reusable extraction, analysis, training, losses, and
+              configuration.
+            </p>
+          </div>
+          <aside class="item">
+            <h3>Links</h3>
+            <ul class="plain-list">
+              <li><a href="https://ieeexplore.ieee.org/abstract/document/11568428">IEEE Xplore document 11568428</a></li>
+              <li><a href="https://github.com/baogegeJiang/FPS">GitHub repository</a></li>
+              <li><a href="https://github.com/baogegeJiang/FPS/blob/main/README.md">README</a></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section id="quick-start" class="section">
+        <div class="container">
+          <p class="eyebrow">Quick Start</p>
+          <h2>Run a real-H5 task bundled with the repository</h2>
+          <p>
+            The repository includes a compressed Office31
+            <code>amazon -> webcam</code> ViT feature bank. It keeps all source
+            and target samples for that task and only the views needed by the
+            example config.
+          </p>
+          <div class="code-grid">
+            <article>
+              <h3>Install from GitHub</h3>
+              <pre><code>pip install "fps-uda[vision,hf] @ git+https://github.com/baogegeJiang/FPS.git"</code></pre>
+              <p>
+                Clone the repository instead when you want the packaged H5
+                example file and editable development mode.
+              </p>
+              <pre><code>git clone https://github.com/baogegeJiang/FPS.git
+cd FPS
+pip install -e ".[vision,hf,dev]"</code></pre>
+            </article>
+            <article>
+              <h3>Smoke run</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
+  --config configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml \
+  --iter-num 2 \
+  --out runs/examples/office31_aw_vit_smoke</code></pre>
+              <p>
+                After editable install, replace
+                <code>PYTHONPATH=src python -m fps_uda.cli</code> with
+                <code>fps-uda</code>.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" class="section">
+        <div class="container">
+          <p class="eyebrow">CLI Workflow</p>
+          <h2>Feature bank -> analysis -> training -> sweep</h2>
+          <div class="workflow">
+            <article>
+              <span class="step">1</span>
+              <h3>Download banks</h3>
+              <pre><code>python scripts/download_feature_banks.py all</code></pre>
+              <p>Downloads released H5 banks from the Hugging Face dataset repo.</p>
+            </article>
+            <article>
+              <span class="step">2</span>
+              <h3>Extract features</h3>
+              <pre><code>fps-uda extract-feature-bank \
+  --dataset-config configs/datasets/office31_vit.yaml \
+  --out fps_h5cache/banks/office31_vit.h5 \
+  --device cuda:0</code></pre>
+              <p>Dataset YAML declares domains, transforms, backbone, and views.</p>
+            </article>
+            <article>
+              <span class="step">3</span>
+              <h3>Analyze views</h3>
+              <pre><code>fps-uda analyze-feature-bank \
+  --feature-bank fps_h5cache/banks/office31_vit.h5 \
+  --source-domain amazon \
+  --target-domain webcam \
+  --out runs/analysis/office31_vit</code></pre>
+              <p>Analysis uses labels for debugging and does not modify the bank.</p>
+            </article>
+            <article>
+              <span class="step">4</span>
+              <h3>Train or sweep</h3>
+              <pre><code>fps-uda train \
+  --config configs/training/office31/amazon_to_webcam/vit.yaml \
+  --out runs/office31/amazon_to_webcam/vit
+
+fps-uda sweep \
+  --config configs/training/office31/amazon_to_webcam/vit.yaml \
+  --alpha-grid 0.6,0.8,1.0 \
+  --beta-grid 0.4,0.6 \
+  --out runs/sweeps/office31_aw_vit</code></pre>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="concepts" class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Core Concepts</p>
+          <h2>Dataset-level H5 banks and explicit view roles</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Meaning</th>
+                  <th>Typical view</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>src</code></td>
+                  <td>Source supervised features and labels.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+                <tr>
+                  <td><code>entropy</code></td>
+                  <td>Target view for LSE/LCE entropy losses.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+                <tr>
+                  <td><code>cr.view1</code>, <code>cr.view2</code></td>
+                  <td>Paired target views for LCR consistency.</td>
+                  <td><code>*_pool_a</code>, <code>*_pool_b</code></td>
+                </tr>
+                <tr>
+                  <td><code>eval</code></td>
+                  <td>Target view for metrics and predictions.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code>/domains/{domain}/label
+/domains/{domain}/views/{view_key}/feature</code></pre>
+        </div>
+      </section>
+
+      <section id="config" class="section">
+        <div class="container">
+          <p class="eyebrow">Configuration</p>
+          <h2>Training and extraction configs are explicit</h2>
+          <div class="cards">
+            <article class="item">
+              <h3><code>io</code> and <code>views</code></h3>
+              <p>
+                Select the H5 bank, source/target domains, feature transform,
+                and role-specific view keys. Multiple views can be
+                <code>stack</code>ed or <code>mean</code>-combined.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>optimization</code> and <code>schedule</code></h3>
+              <p>
+                Configure SGD or AdamW, <code>base_lr</code>, LR schedule,
+                update count, dynamic <code>alpha/beta</code>, and sample
+                ratios.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>losses</code></h3>
+              <p>
+                Enable LSE, LCE, LCR, LDelta, sparse density weights, and
+                pseudo-margin weights. <code>margin_start_step</code> makes the
+                margin warmup explicit.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Extraction YAML</h3>
+              <p>
+                Declares domain manifests, image normalization, deterministic
+                view geometry, backbone backend, and pooling strategy.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Backbone defaults</h3>
+              <p>
+                ResNet presets use torchvision weights and spatial shared
+                random pooling. ViT presets use timm and token-channel squared
+                random pooling.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Packaged example</h3>
+              <p>
+                <code>configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml</code>
+                runs directly on the bundled H5 fixture.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="api" class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Python API</p>
+          <h2>Train from NumPy, Torch, or selected H5 views</h2>
+          <article class="wide-code">
+            <pre><code>from fps_uda import FeatureSet, FPSConfig, train_fps
+
+features = FeatureSet(
+    src_features=src_x,
+    src_labels=src_y,
+    entropy_features=tgt_x_eval,
+    entropy_labels=tgt_y_eval,
+    cr_features_1=tgt_x_view1,
+    cr_features_2=tgt_x_view2,
+    cr_labels=tgt_y_eval,
+    eval_features=tgt_x_eval,
+    eval_labels=tgt_y_eval,
+)
+
+config = FPSConfig(
+    num_classes=31,
+    feature_dim=src_x.shape[1],
+    device="cuda:0",
+    base_lr=0.000375,
+    iter_num=3000,
+)
+
+result = train_fps(features, config, output_dir="runs/python_api")</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section id="advanced" class="section">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Advanced</p>
+            <h2>Customize losses and backbones in Python</h2>
+            <p>
+              Custom losses receive a dict-like context with
+              <code>batch</code>, <code>outputs</code>, <code>weights</code>,
+              <code>schedules</code>, <code>step</code>, and mutable
+              <code>state</code>. Use <code>extra_loss_terms</code> to append a
+              loss, or <code>loss_terms</code> to replace the default list.
+            </p>
+            <pre><code>from fps_uda import LossOutput
+
+def extra_entropy_logit_penalty(ctx):
+    logits = ctx["outputs"]["entropy.logits"]
+    value = logits.sum() * 0.0 if ctx["step"] < 100 else 0.01 * logits.pow(2).mean()
+    return LossOutput("extra_entropy_logit_penalty", value)</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Runnable examples</h3>
+            <ul class="plain-list">
+              <li><code>examples/custom_loss_training.py</code></li>
+              <li><code>examples/advanced_custom_backbone_feature_bank.py</code></li>
+            </ul>
+            <p>
+              A custom backbone may return flat features, spatial maps, or token
+              features; <code>PoolableBackbone</code> handles FPS-UDA pooling
+              views.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="citation" class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Citation</p>
+            <h2>Cite the IEEE Xplore paper</h2>
+            <pre><code>@article{cheng_fps_uda,
+  title  = {Feature-Space Planes Searcher: A Universal Domain Adaptation Framework for Interpretability and Computational Efficiency},
+  author = {Cheng, Zhitong and Jiang, Yiran and Ge, Yulong and Li, Yufeng and Qin, Zhongheng and Lin, Rongzhi and Ma, Jianwei},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  url    = {https://ieeexplore.ieee.org/abstract/document/11568428},
+  note   = {IEEE Xplore document 11568428}
+}</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Code contributors</h3>
+            <ul class="plain-list">
+              <li><a href="https://github.com/baogegeJiang">baogegeJiang</a></li>
+              <li><a href="https://github.com/re-Gwen">re-Gwen</a></li>
+              <li><a href="https://github.com/Long-louis">Long-louis</a></li>
+              <li><a href="https://github.com/sayori1698">sayori1698</a></li>
+              <li><a href="https://github.com/ZhongH-Qin">ZhongH-Qin</a></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section id="pages" class="section">
+        <div class="container">
+          <p class="eyebrow">Publishing</p>
+          <h2>GitHub Pages setup</h2>
+          <p>
+            This site has no build step. In repository settings, publish from
+            the <code>main</code> branch and the <code>/docs</code> folder.
+          </p>
+          <pre><code>Settings -> Pages -> Deploy from a branch -> main / docs</code></pre>
+          <p>
+            Public URL:
+            <a href="https://baogegeJiang.github.io/FPS/">https://baogegeJiang.github.io/FPS/</a>
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

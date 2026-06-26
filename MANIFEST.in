@@ -1,0 +1,16 @@
+include LICENSE
+include README.md
+prune bak
+prune .agents
+prune .codex
+prune .git
+prune data
+prune fps_h5cache
+prune runs
+prune analysis
+prune docs
+prune tests
+include configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml
+include tests/fixtures/README.md
+include tests/fixtures/office31_amazon_to_webcam_vit_smoke.h5
+global-exclude __pycache__ *.py[cod] .pytest_cache .DS_Store

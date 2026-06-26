@@ -1,0 +1,75 @@
+io:
+  feature_bank: fps_h5cache/banks/office_home_vit.h5
+  source_domain: Art
+  target_domain: Clipart
+  feature_transform: none
+  num_classes: 65
+  device: cuda:0
+views:
+  src:
+    key: pad_resize256_input224_center_orig_clean,pad_resize256_input224_center_hflip_clean,pad_resize256_input224_br_orig_clean,pad_resize256_input224_br_hflip_clean,pad_resize256_input224_bl_orig_clean,pad_resize256_input224_bl_hflip_clean,pad_resize256_input224_tr_orig_clean,pad_resize256_input224_tr_hflip_clean,pad_resize256_input224_tl_orig_clean,pad_resize256_input224_tl_hflip_clean
+    combine: stack
+  entropy:
+    key: pad_resize256_input224_center_orig_clean,pad_resize256_input224_center_hflip_clean
+    combine: stack
+  cr:
+    view1:
+      key: pad_resize256_input224_center_orig_pool_a,pad_resize256_input224_br_orig_pool_a,pad_resize256_input224_bl_orig_pool_a,pad_resize256_input224_tr_orig_pool_a,pad_resize256_input224_tl_orig_pool_a
+      combine: stack
+    view2:
+      key: pad_resize256_input224_center_orig_pool_b,pad_resize256_input224_br_orig_pool_b,pad_resize256_input224_bl_orig_pool_b,pad_resize256_input224_tr_orig_pool_b,pad_resize256_input224_tl_orig_pool_b
+      combine: stack
+  eval:
+    key: pad_resize256_input224_center_orig_clean,pad_resize256_input224_center_hflip_clean
+    combine: mean
+optimization:
+  base_lr: 0.000375
+  momentum: 0.9
+  optimizer: sgd
+  nesterov: false
+  weight_decay: 0.0
+  lr_schedule: linear_step
+  min_lr: 0.0
+schedule:
+  seed: 0
+  iter_num: 4000
+  alpha: 0.85
+  beta: 0.45
+  alpha_0: 0.1
+  beta_0: 0.1
+  schedule_tau: 1000
+  dynamic_parameters: true
+normalization:
+  normalize: cross_norm
+  cross_norm_scale: 1.0
+  self_norm_scale_src: 1
+  self_norm_scale_tgt: 1
+losses:
+  use_consistency_loss: true
+  use_correction: false
+  use_shift_constraint: false
+  use_classes_weight: true
+  baseline: false
+  use_lse: true
+  use_lce: true
+  use_lcr: true
+  lambda_lcr: 0.375
+  lcr_loss: mse
+  pseudo_margin: true
+  margin_start_step: 100
+  use_temperature: false
+  begin_temperature: 30
+  use_geom_test: false
+  geom_alpha: 1
+  geom_beta: 1
+  sparse_weight_a: 5
+  sample_entropy_type: shannon
+  margin_quantile: 0.01
+  margin_weight_type: normalized_logit_gap
+  margin_convert_mode: quantile_sigmoid
+  margin_sigmoid_tau: 0.2
+  margin_sigmoid_boundary_weight: 0.5
+eval:
+  multi_class: true
+  eval_interval: 20
+  progress: true

@@ -1,0 +1,41 @@
+name: visda17_vit
+root_dir: data/visda17
+backbone:
+  backend: timm
+  name: vit_base_patch16_224.augreg2_in21k_ft_in1k
+  pretrained: true
+  weights: null
+  checkpoint: null
+  in_features: 768
+  kwargs:
+    class_token: true
+    global_pool: token
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared
+loader:
+  batch_size: 256
+  num_workers: 16
+  seed: 515
+  strong_aug: false
+  distributed: false
+  pin_memory: true
+  drop_last: false
+transform:
+  interpolation: bicubic
+  antialias: true
+  pad_fill: 127
+  mean: [0.5, 0.5, 0.5]
+  std: [0.5, 0.5, 0.5]
+domains:
+  - {name: train, kind: manifest, image_root: train, manifest: train/image_list.txt, path_column: 0, label_column: 1}
+  - {name: validation, kind: manifest, image_root: validation, manifest: validation/image_list.txt, path_column: 0, label_column: 1}
+feature_bank:
+  water_level: 0.0
+  mute_padding_in_pool: true
+  views:
+    - {key: pad_resize256_input224_tl_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: tl, flip: orig}
+    - {key: pad_resize256_input224_tr_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: tr, flip: orig}
+    - {key: pad_resize256_input224_bl_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: bl, flip: orig}
+    - {key: pad_resize256_input224_br_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: br, flip: orig}
+    - {key: pad_resize256_input224_center_orig, pad_to_square: true, resize_size: 256, input_size: 224, crop: center, flip: orig}
