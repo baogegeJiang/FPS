@@ -13,7 +13,7 @@ The package name is `fps-uda`; the import name is `fps_uda`.
 - Documentation: [baogegeJiang.github.io/FPS](https://baogegeJiang.github.io/FPS/)
 
 <p align="center">
-  <img src="docs/assets/shallow-intelligence-group.png" alt="Shallow Intelligence Group" width="260">
+  <img src="docs/assets/shallow-intelligence-group.png" alt="Shallow Intelligence" width="260">
 </p>
 
 ## Paper

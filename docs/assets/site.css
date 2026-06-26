@@ -138,6 +138,10 @@ pre code {
   align-items: start;
 }
 
+.hero-grid {
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.55fr);
+}
+
 .eyebrow {
   margin: 0 0 10px;
   color: var(--accent-strong);
@@ -156,8 +160,8 @@ h3 {
 }
 
 h1 {
-  max-width: 860px;
-  font-size: clamp(2.35rem, 6vw, 4.8rem);
+  max-width: 920px;
+  font-size: clamp(2.35rem, 5.2vw, 4.4rem);
 }
 
 h2 {
@@ -181,6 +185,11 @@ p {
 
 .plain-list li + li {
   margin-top: 8px;
+}
+
+.plain-list code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lead {
