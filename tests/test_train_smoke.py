@@ -303,3 +303,38 @@ def test_custom_extra_loss_reads_context_and_can_warm_up():
         for key in baseline.final_model_state
     )
     assert state_abs_diff > 1e-8
+
+
+def test_use_temperature_populates_loss_context_schedule():
+    temperatures = []
+
+    def capture_temperature(ctx):
+        temperatures.append(ctx["schedules"]["temperature"])
+        logits = ctx["outputs"]["entropy.logits"]
+        value = logits.sum() * 0.0
+        return LossOutput(
+            name="capture_temperature",
+            value=value,
+            logs={"temperature_seen": float(ctx["schedules"]["temperature"])},
+        )
+
+    config = FPSConfig(
+        num_classes=2,
+        feature_dim=4,
+        device="cpu",
+        base_lr=0.01,
+        iter_num=2,
+        eval_interval=1,
+        progress=False,
+        seed=8,
+        normalize="none",
+        pseudo_margin=False,
+        use_lcr=False,
+        use_temperature=True,
+        begin_temperature=10.0,
+    )
+
+    result = train_fps(_features(seed=765), config, extra_loss_terms=[capture_temperature])
+
+    assert all(value is not None for value in temperatures)
+    assert result.history[0]["temperature_seen"] == temperatures[0]

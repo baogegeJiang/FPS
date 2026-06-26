@@ -18,12 +18,7 @@ from fps_uda.training.evaluation import (
 )
 from fps_uda.training.loss_api import LossCallable, LossOutput, LossTerm
 from fps_uda.training.loss_defs import (
-    compute_margin_pair as _compute_margin_pair,
-    convert_margin_to_weight_pair as _convert_margin_to_weight_pair,
     default_loss_terms,
-    lcr_loss as _lcr_loss,
-    lcr_sample_weight as _lcr_sample_weight,
-    ldelta_loss as _ldelta_loss,
     sparse_weight as _sparse_weight,
 )
 from fps_uda.training.optimization import (
