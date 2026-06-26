@@ -17,6 +17,13 @@ def _touch(path: Path):
     path.write_bytes(b"fake image")
 
 
+def test_visda17_default_download_urls_use_https():
+    module = _load_script_module()
+
+    assert module.DEFAULT_URLS["visda17_train"].startswith("https://")
+    assert module.DEFAULT_URLS["visda17_validation"].startswith("https://")
+
+
 def test_prepare_office_home_skip_download_generates_annotations(tmp_path):
     module = _load_script_module()
     root = tmp_path / "data"
@@ -67,4 +74,3 @@ def test_prepare_visda17_skip_download_generates_image_lists(tmp_path):
         "aeroplane/a.jpg 0",
         "car/c.jpg 3",
     ]
-

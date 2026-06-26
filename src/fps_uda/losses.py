@@ -59,7 +59,7 @@ def consistency_loss(
     mask=None,
     entropy_type="shannon",
     tsallis_q=1.5,
-    legacy_mode=True,
+    legacy_mode=False,
     adaptive_temp_margin_theta=0.15,
     adaptive_temp_margin_tau=0.05,
     adaptive_temp_t_min=0.7,

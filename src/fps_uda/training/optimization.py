@@ -74,7 +74,11 @@ def hyperparameters(cfg: FPSConfig, step: int, device: torch.device):
     lcr_weight = (
         float(cfg.lambda_lcr)
         if cfg.lambda_lcr is not None
-        else (float(cfg.randn_ratio) if cfg.randn_ratio is not None else 0.55)
+        else (
+            float(cfg.randn_ratio)
+            if cfg.randn_ratio is not None
+            else 0.55  # FPS paper default LCR weight.
+        )
     )
     if not cfg.dynamic_parameters:
         return {

@@ -16,8 +16,8 @@ IMAGE_EXTENSIONS = {".bmp", ".jpeg", ".jpg", ".png", ".webp"}
 DEFAULT_URLS = {
     "office31": "https://people.eecs.berkeley.edu/~jhoffman/domainadapt/office_31.tar.gz",
     "office_home": "https://www.hemanthdv.org/OfficeHome-Dataset/OfficeHomeDataset_10072016.zip",
-    "visda17_train": "http://csr.bu.edu/ftp/visda17/clf/train.tar",
-    "visda17_validation": "http://csr.bu.edu/ftp/visda17/clf/validation.tar",
+    "visda17_train": "https://csr.bu.edu/ftp/visda17/clf/train.tar",
+    "visda17_validation": "https://csr.bu.edu/ftp/visda17/clf/validation.tar",
 }
 
 OFFICE31_DOMAINS = ("amazon", "dslr", "webcam")

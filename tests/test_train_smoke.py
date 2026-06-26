@@ -58,6 +58,28 @@ def test_train_fps_cpu_smoke():
     assert "cr2_acc" in result.history[0]
 
 
+def test_train_fps_records_invr_when_true_class_r_is_zero():
+    features = _features(seed=17)
+    features.eval_features = np.zeros_like(features.eval_features)
+    config = FPSConfig(
+        num_classes=2,
+        feature_dim=4,
+        device="cpu",
+        base_lr=0.01,
+        iter_num=1,
+        eval_interval=1,
+        progress=False,
+        normalize="none",
+        pseudo_margin=False,
+        use_lcr=False,
+    )
+
+    result = train_fps(features, config)
+
+    assert "invR" in result.history[0]
+    assert result.history[0]["invR"] == 0.0
+
+
 def test_train_fps_uses_configured_momentum(monkeypatch):
     captured = {}
     original_sgd = torch.optim.SGD

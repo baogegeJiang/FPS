@@ -292,7 +292,7 @@ fps-uda extract-feature-bank \
 Regenerate all benchmark banks:
 
 ```bash
-PYTHON_BIN=/home/jiangyiran/.conda/envs/All/bin/python \
+PYTHON_BIN=python \
 DEVICE=cuda:0 \
 NUM_WORKERS=16 \
 bash scripts/extract_benchmark_feature_banks.sh
@@ -706,7 +706,7 @@ and writes a standard FPS-UDA feature bank. A custom model may return:
 Run every benchmark Office31, OfficeHome, and VisDA17 config:
 
 ```bash
-PYTHON_BIN=/home/jiangyiran/.conda/envs/All/bin/python \
+PYTHON_BIN=python \
 DEVICE=cuda:0 \
 RESUME=1 \
 KEEP_GOING=1 \

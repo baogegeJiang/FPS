@@ -9,6 +9,7 @@ import yaml
 from fps_uda import FPSConfig, FeatureSet
 from fps_uda.cli import _resolve_feature_transform
 from fps_uda.io.config import flatten_training_config
+from fps_uda.losses import consistency_loss, supervise_loss
 from fps_uda.training.trainer import (
     _build_optimizer,
     _convert_margin_to_weight_pair,
@@ -166,6 +167,17 @@ def test_public_default_lcr_and_margin_parameters():
     assert config.margin_convert_mode == "quantile_sigmoid"
     assert config.margin_sigmoid_tau == pytest.approx(0.2)
     assert config.margin_sigmoid_boundary_weight == pytest.approx(0.2)
+
+
+def test_public_loss_defaults_match_config_legacy_mode():
+    config = FPSConfig(num_classes=2, feature_dim=1, device="cpu", base_lr=0.001)
+    p = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+    labels = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+    weights = torch.ones(2)
+
+    assert config.legacy_loss_mode is False
+    assert torch.isfinite(supervise_loss(p, labels))
+    assert torch.isfinite(consistency_loss(p, weights, alpha=0.5))
 
 
 def test_lcr_loss_mse_and_l2_are_logits_space():

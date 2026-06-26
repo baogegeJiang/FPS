@@ -314,7 +314,11 @@ def train_fps(
             row.update(
                 {key: float(value) for key, value in view_accs.items() if value is not None}
             )
-            if class_r_true and predictions is not None and data.eval_features is not None:
+            if (
+                class_r_true is not None
+                and predictions is not None
+                and data.eval_features is not None
+            ):
                 class_r = _class_r_mean(
                     predictions.argmax(axis=-1), data.eval_features.detach().cpu().numpy()
                 )
