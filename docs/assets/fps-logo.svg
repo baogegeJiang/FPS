@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">FPS logo</title>
+  <desc id="desc">A decision plane cutting through sample points in a 3D feature space.</desc>
+  <defs>
+    <linearGradient id="cubeFace" x1="160" y1="90" x2="780" y2="510" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#bdf7f6" stop-opacity=".46"/>
+      <stop offset="1" stop-color="#7dd8ee" stop-opacity=".24"/>
+    </linearGradient>
+    <linearGradient id="planeFill" x1="108" y1="288" x2="830" y2="238" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f8fdff"/>
+      <stop offset=".5" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e7f4ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="48%" r="62%">
+      <stop offset="0" stop-color="#9ef7ff" stop-opacity=".28"/>
+      <stop offset=".46" stop-color="#a6a2ff" stop-opacity=".20"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#0d4c80" flood-opacity=".24"/>
+    </filter>
+    <filter id="dotGlow" x="-90%" y="-90%" width="280%" height="280%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="640" fill="none"/>
+  <ellipse cx="470" cy="292" rx="430" ry="250" fill="url(#glow)"/>
+
+  <g fill="url(#cubeFace)" stroke="#29bfd8" stroke-width="2.6" opacity=".78">
+    <polygon points="158,78 570,78 778,200 366,200"/>
+    <polygon points="158,78 366,200 366,506 158,384"/>
+    <polygon points="366,200 778,200 778,506 366,506"/>
+  </g>
+  <g fill="none" stroke="#1bb5d0" stroke-width="2" opacity=".55">
+    <path d="M158 78v306M570 78v306M778 200v306M366 200v306"/>
+    <path d="M158 384h412l208 122M570 384l208 122"/>
+  </g>
+
+  <g filter="url(#dotGlow)">
+    <circle cx="260" cy="220" r="9" fill="#256fd6"/>
+    <circle cx="336" cy="182" r="7" fill="#256fd6"/>
+    <circle cx="476" cy="165" r="8" fill="#256fd6"/>
+    <circle cx="540" cy="148" r="10" fill="#256fd6"/>
+    <circle cx="210" cy="390" r="14" fill="#f3bf28"/>
+    <circle cx="246" cy="426" r="11" fill="#f3bf28"/>
+    <circle cx="326" cy="452" r="13" fill="#f3bf28"/>
+    <circle cx="486" cy="416" r="16" fill="#f3bf28"/>
+    <circle cx="605" cy="354" r="13" fill="#f3bf28"/>
+    <circle cx="690" cy="354" r="18" fill="#f3bf28"/>
+    <circle cx="342" cy="358" r="17" fill="#32c7c7"/>
+    <circle cx="438" cy="330" r="16" fill="#32c7c7"/>
+    <circle cx="575" cy="382" r="18" fill="#32c7c7"/>
+    <circle cx="704" cy="308" r="13" fill="#32c7c7"/>
+    <circle cx="330" cy="310" r="17" fill="#256fd6"/>
+    <circle cx="394" cy="328" r="20" fill="#256fd6"/>
+    <circle cx="456" cy="304" r="19" fill="#256fd6"/>
+    <circle cx="518" cy="318" r="21" fill="#256fd6"/>
+    <circle cx="612" cy="295" r="18" fill="#256fd6"/>
+    <circle cx="730" cy="292" r="18" fill="#256fd6"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <polygon points="108,233 590,124 830,338 348,456" fill="url(#planeFill)" stroke="#2d9ddd" stroke-width="4"/>
+    <g stroke="#63aeea" stroke-width="2" opacity=".72">
+      <path d="M190 215 414 441M304 190 526 413M420 164 642 385M534 138 758 356"/>
+      <path d="M178 278 682 160M244 338 750 220M316 396 822 280"/>
+    </g>
+  </g>
+
+  <g fill="none" stroke="#158ed5" stroke-width="2.4" opacity=".72">
+    <circle cx="236" cy="292" r="7"/>
+    <circle cx="358" cy="280" r="7"/>
+    <circle cx="424" cy="268" r="7"/>
+    <circle cx="486" cy="270" r="7"/>
+    <circle cx="584" cy="286" r="7"/>
+    <circle cx="666" cy="304" r="7"/>
+  </g>
+
+  <text
+    x="455"
+    y="584"
+    fill="#06306f"
+    stroke="#ffffff"
+    stroke-width="5"
+    paint-order="stroke fill"
+    font-family="Arial Black, Impact, sans-serif"
+    font-size="88"
+    font-style="italic"
+    font-weight="900"
+    letter-spacing="4"
+  >FPS</text>
+  <text x="386" y="612" fill="#5a6b7a" font-family="Inter, Arial, sans-serif" font-size="20">
+    Feature-Space Planes Searcher
+  </text>
+</svg>

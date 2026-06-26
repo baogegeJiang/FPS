@@ -8,8 +8,8 @@
   --line: #d8dee6;
   --accent: #216f6b;
   --accent-strong: #174d4b;
-  --code-bg: #111827;
-  --code-text: #e5eef8;
+  --code-bg: #f3f6f8;
+  --code-text: #26313d;
   --shadow: 0 12px 30px rgba(23, 32, 42, 0.08);
 }
 
@@ -44,6 +44,10 @@ a:hover {
 code {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
+  color: #1f3f46;
+  background: #edf4f4;
+  border-radius: 4px;
+  padding: 0.08em 0.28em;
 }
 
 pre {
@@ -51,6 +55,7 @@ pre {
   overflow-x: auto;
   color: var(--code-text);
   background: var(--code-bg);
+  border: 1px solid #d4dde5;
   border-radius: 8px;
   padding: 18px;
   line-height: 1.55;
@@ -58,6 +63,10 @@ pre {
 
 pre code {
   font-size: 0.9rem;
+  color: inherit;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 
 .site-header {
@@ -255,11 +264,18 @@ p {
   box-shadow: var(--shadow);
 }
 
+.fps-logo {
+  display: block;
+  width: min(300px, 100%);
+  height: auto;
+  margin: -8px auto 16px;
+}
+
 .group-logo {
   display: block;
-  width: min(220px, 100%);
+  width: min(160px, 100%);
   height: auto;
-  margin: 0 auto 22px;
+  margin: 0 auto 24px;
 }
 
 .status-panel h2 {
