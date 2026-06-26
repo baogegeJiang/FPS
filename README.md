@@ -63,7 +63,7 @@ components can be reused more easily.
 This open-source library includes code contributions from:
 
 - [baogegeJiang](https://github.com/baogegeJiang)
-- [re-Gwen](https://github.com/re-Gwen)
+- [1eyan](https://github.com/1eyan)
 - [Long-louis](https://github.com/Long-louis)
 - [sayori1698](https://github.com/sayori1698)
 - [ZhongH-Qin](https://github.com/ZhongH-Qin)

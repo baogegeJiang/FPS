@@ -16,6 +16,7 @@ def test_office31_amazon_to_webcam_vit_real_h5_smoke(tmp_path):
     assert FIXTURE.exists(), "packaged real-H5 smoke fixture is missing"
 
     config = yaml.safe_load(BASE_CONFIG.read_text())
+    config["io"]["device"] = "cpu"
     config["schedule"]["iter_num"] = 2
     config["losses"]["pseudo_margin"] = False
     config["eval"]["eval_interval"] = 1
@@ -31,6 +32,9 @@ def test_office31_amazon_to_webcam_vit_real_h5_smoke(tmp_path):
     assert metrics["best_metric"] == "acc"
     assert metrics["best_score"] is not None
     assert metrics["best_cwc"] is not None
+    assert metrics["has_best_cwc_predictions"] is True
+    assert (out / "best_cwc_predictions.npy").exists()
+    assert (out / "best_cwc_labels.npy").exists()
     assert metrics["config"]["feature_dim"] == 768
     assert metrics["config"]["num_classes"] == 31
     for field in ("loss_sup", "loss_consistency", "loss_lcr", "lr"):

@@ -18,6 +18,8 @@ class TrainingResult:
     history: List[Dict[str, float]] = field(default_factory=list)
     predictions: Optional[np.ndarray] = None
     labels: Optional[np.ndarray] = None
+    best_cwc_predictions: Optional[np.ndarray] = None
+    best_cwc_labels: Optional[np.ndarray] = None
     final_model_state: Optional[Dict[str, torch.Tensor]] = None
     config: Dict[str, Any] = field(default_factory=dict)
 
@@ -30,6 +32,8 @@ class TrainingResult:
             "history": self.history,
             "has_predictions": self.predictions is not None,
             "has_labels": self.labels is not None,
+            "has_best_cwc_predictions": self.best_cwc_predictions is not None,
+            "has_best_cwc_labels": self.best_cwc_labels is not None,
             "config": self.config,
         }
 
@@ -44,5 +48,9 @@ class TrainingResult:
             np.save(out / "predictions.npy", self.predictions)
         if self.labels is not None:
             np.save(out / "labels.npy", self.labels)
+        if self.best_cwc_predictions is not None:
+            np.save(out / "best_cwc_predictions.npy", self.best_cwc_predictions)
+        if self.best_cwc_labels is not None:
+            np.save(out / "best_cwc_labels.npy", self.best_cwc_labels)
         if self.final_model_state is not None:
             torch.save(self.final_model_state, out / "final_model.pt")

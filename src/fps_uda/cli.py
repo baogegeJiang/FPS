@@ -28,6 +28,8 @@ def _compact_result_dict(result, output_dir: str) -> dict:
         "history_steps": len(result.history),
         "has_predictions": result.predictions is not None,
         "has_labels": result.labels is not None,
+        "has_best_cwc_predictions": result.best_cwc_predictions is not None,
+        "has_best_cwc_labels": result.best_cwc_labels is not None,
         "output_dir": output_dir,
     }
     if last_eval is not None:

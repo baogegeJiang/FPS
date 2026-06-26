@@ -116,6 +116,12 @@ def test_cli_train_from_view_role_yaml(tmp_path):
     assert metrics["best_metric"] == "acc"
     assert metrics["best_cwc"] is not None
     assert metrics["best_cwc_step"] is not None
+    assert metrics["has_best_cwc_predictions"] is True
+    assert metrics["has_best_cwc_labels"] is True
+    assert (out / "predictions.npy").exists()
+    assert (out / "labels.npy").exists()
+    assert (out / "best_cwc_predictions.npy").exists()
+    assert (out / "best_cwc_labels.npy").exists()
     assert metrics["config"]["lcr_loss"] == "mse"
     assert metrics["config"]["src_sample_ratio"] == 0.5
     assert metrics["config"]["target_sample_ratio"] == 0.75

@@ -207,6 +207,8 @@ def train_fps(
     labels = None
     best_predictions = None
     best_labels = None
+    best_cwc_predictions = None
+    best_cwc_labels = None
     class_r_true = None
     if data.eval_features is not None and data.eval_labels is not None:
         class_r_true = _class_r_mean(
@@ -326,6 +328,8 @@ def train_fps(
             ):
                 best_cwc = row["class_wise_acc"]
                 best_cwc_step = row["step"]
+                best_cwc_predictions = None if predictions is None else predictions.copy()
+                best_cwc_labels = None if labels is None else labels.copy()
             if best_cwc is not None:
                 row["best_cwc"] = float(best_cwc)
                 row["best_cwc_step"] = float(best_cwc_step)
@@ -358,6 +362,8 @@ def train_fps(
         history=history,
         predictions=best_predictions if best_predictions is not None else predictions,
         labels=best_labels if best_labels is not None else labels,
+        best_cwc_predictions=best_cwc_predictions,
+        best_cwc_labels=best_cwc_labels,
         final_model_state={k: v.detach().cpu() for k, v in model.state_dict().items()},
         config=config.to_dict(),
     )

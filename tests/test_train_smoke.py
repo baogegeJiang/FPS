@@ -46,6 +46,8 @@ def test_train_fps_cpu_smoke():
     assert result.best_cwc is not None
     assert result.best_cwc_step is not None
     assert result.predictions.shape == (6, 2)
+    assert result.best_cwc_predictions.shape == (6, 2)
+    assert result.best_cwc_labels.shape == (6,)
     assert result.history[0]["lr"] == 0.01
     assert result.history[1]["lr"] == 0.02
     assert "best_cwc" in result.history[0]
