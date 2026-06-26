@@ -156,7 +156,12 @@ pip install -e ".[hf]"</code></pre>
               <span class="step">1</span>
               <h3>Download banks</h3>
               <pre><code>python scripts/download_feature_banks.py all</code></pre>
-              <p>Downloads released H5 banks from the Hugging Face dataset repo.</p>
+              <p>
+                Downloads released H5 banks from the Hugging Face dataset repo.
+                The default endpoint mode automatically falls back to
+                <code>https://hf-mirror.com</code>; use
+                <code>--endpoint hf-mirror</code> to force the mirror.
+              </p>
             </article>
             <article>
               <span class="step">2</span>

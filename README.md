@@ -227,6 +227,14 @@ Benchmark banks can be downloaded from the Hugging Face dataset repo
 python scripts/download_feature_banks.py all
 ```
 
+The downloader defaults to `--endpoint auto`: it tries `HF_ENDPOINT` if already
+set, then `https://huggingface.co`, and finally `https://hf-mirror.com`. To force
+the domestic mirror:
+
+```bash
+python scripts/download_feature_banks.py all --endpoint hf-mirror
+```
+
 Download a subset:
 
 ```bash
