@@ -40,3 +40,30 @@ def test_endpoint_candidates_accepts_alias_and_custom_url():
     assert module.endpoint_candidates("https://example.invalid/hf/") == [
         ("https://example.invalid/hf", "https://example.invalid/hf")
     ]
+
+
+def test_direct_resolve_url_uses_dataset_prefix_and_main_revision():
+    module = _load_script_module()
+
+    assert module.direct_resolve_url(
+        "https://hf-mirror.com/",
+        "baogege1995/FPS_H5",
+        "dataset",
+        None,
+        "banks/office31_resnet50.h5",
+    ) == (
+        "https://hf-mirror.com/datasets/baogege1995/FPS_H5/resolve/main/"
+        "banks/office31_resnet50.h5"
+    )
+
+
+def test_direct_resolve_url_encodes_revision_and_file_path():
+    module = _load_script_module()
+
+    assert module.direct_resolve_url(
+        "https://huggingface.co",
+        "org/model",
+        "model",
+        "refs/pr/1",
+        "dir/file with space.h5",
+    ) == "https://huggingface.co/org/model/resolve/refs%2Fpr%2F1/dir/file%20with%20space.h5"

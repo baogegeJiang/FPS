@@ -6,6 +6,9 @@ from __future__ import annotations
 import argparse
 import os
 import shutil
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 
@@ -159,6 +162,67 @@ def endpoint_candidates(endpoint: str) -> list[tuple[str, str]]:
     return deduped
 
 
+def direct_resolve_url(
+    endpoint_url: str,
+    repo_id: str,
+    repo_type: str,
+    revision: str | None,
+    remote_path: str,
+) -> str:
+    repo_prefix = {"dataset": "datasets/", "space": "spaces/", "model": ""}[repo_type]
+    repo_path = urllib.parse.quote(repo_id.strip("/"), safe="/")
+    revision_path = urllib.parse.quote(revision or "main", safe="")
+    file_path = urllib.parse.quote(remote_path.strip("/"), safe="/")
+    return f"{endpoint_url.rstrip('/')}/{repo_prefix}{repo_path}/resolve/{revision_path}/{file_path}"
+
+
+def download_direct_url(url: str, output_path: Path, force: bool) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    if output_path.exists() and not force:
+        print(f"[skip] {output_path} already exists")
+        return
+
+    tmp_path = output_path.with_name(output_path.name + ".tmp")
+    if tmp_path.exists():
+        tmp_path.unlink()
+
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "fps-uda-feature-bank-downloader"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            total = int(response.headers.get("Content-Length") or 0)
+            downloaded = 0
+            with tmp_path.open("wb") as handle:
+                while True:
+                    chunk = response.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    handle.write(chunk)
+                    downloaded += len(chunk)
+                    if total:
+                        pct = downloaded * 100.0 / total
+                        print(
+                            f"\r  {downloaded / 1024 / 1024:.1f} MiB / "
+                            f"{total / 1024 / 1024:.1f} MiB ({pct:.1f}%)",
+                            end="",
+                        )
+            if total:
+                print()
+    except urllib.error.HTTPError as exc:
+        if tmp_path.exists():
+            tmp_path.unlink()
+        raise RuntimeError(f"HTTP {exc.code} for {url}") from exc
+    except Exception:
+        if tmp_path.exists():
+            tmp_path.unlink()
+        raise
+
+    tmp_path.replace(output_path)
+    print(f"[ok] downloaded {url} -> {output_path}")
+
+
 def materialize_file(cache_path: str | os.PathLike[str], output_path: Path, force: bool) -> None:
     cache_path = Path(cache_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -191,7 +255,7 @@ def download_one(args: argparse.Namespace, key: str, filename: str) -> None:
     hf_hub_download = import_hf_download()
     candidates = remote_candidates(filename, args.remote_prefix)
     endpoints = endpoint_candidates(args.endpoint)
-    errors: list[tuple[str, str, Exception]] = []
+    errors: list[str] = []
 
     for endpoint_label, endpoint_url in endpoints:
         for remote_path in candidates:
@@ -207,13 +271,31 @@ def download_one(args: argparse.Namespace, key: str, filename: str) -> None:
                     endpoint=endpoint_url,
                 )
             except Exception as exc:  # pragma: no cover - depends on network/HF state.
-                errors.append((endpoint_label, remote_path, exc))
-                continue
+                errors.append(f"  - {endpoint_label} {remote_path} via hub API: {exc}")
+                if args.local_files_only:
+                    continue
+
+                direct_url = direct_resolve_url(
+                    endpoint_url,
+                    args.repo_id,
+                    args.repo_type,
+                    args.revision,
+                    remote_path,
+                )
+                try:
+                    print(f"[try-direct] {key}: {direct_url}")
+                    download_direct_url(direct_url, output_path, args.force)
+                    return
+                except Exception as direct_exc:  # pragma: no cover - depends on network/HF state.
+                    errors.append(
+                        f"  - {endpoint_label} {remote_path} via direct URL: {direct_exc}"
+                    )
+                    continue
 
             materialize_file(cache_path, output_path, args.force)
             return
 
-    details = "\n".join(f"  - {endpoint} {path}: {exc}" for endpoint, path, exc in errors)
+    details = "\n".join(errors)
     raise RuntimeError(f"Failed to download {key} ({filename}). Tried:\n{details}")
 
 

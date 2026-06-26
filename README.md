@@ -235,6 +235,9 @@ the domestic mirror:
 python scripts/download_feature_banks.py all --endpoint hf-mirror
 ```
 
+If Hub metadata lookup fails on a mirror, the script falls back to direct
+`/resolve/...` URLs for the same endpoint.
+
 Download a subset:
 
 ```bash

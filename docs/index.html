@@ -161,6 +161,8 @@ pip install -e ".[hf]"</code></pre>
                 The default endpoint mode automatically falls back to
                 <code>https://hf-mirror.com</code>; use
                 <code>--endpoint hf-mirror</code> to force the mirror.
+                If mirror metadata lookup fails, the script retries with direct
+                <code>/resolve/...</code> URLs.
               </p>
             </article>
             <article>
