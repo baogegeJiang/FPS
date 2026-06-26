@@ -271,13 +271,6 @@ p {
   margin: -8px auto 16px;
 }
 
-.group-logo {
-  display: block;
-  width: min(160px, 100%);
-  height: auto;
-  margin: 0 auto 24px;
-}
-
 .status-panel h2 {
   font-size: 1.1rem;
 }

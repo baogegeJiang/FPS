@@ -16,10 +16,6 @@ The package name is `fps-uda`; the import name is `fps_uda`.
   <img src="docs/assets/fps-logo.png" alt="FPS logo" width="520">
 </p>
 
-<p align="center">
-  <img src="docs/assets/shallow-intelligence-group.png" alt="Shallow Intelligence" width="220">
-</p>
-
 ## Paper
 
 This repository accompanies the FPS paper:
