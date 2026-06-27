@@ -12,7 +12,7 @@ from torch import nn
 DEFAULT_RESNET_BACKBONE = "resnet50"
 DEFAULT_VIT_BACKBONE = "vit_base_patch16_224.augreg2_in21k_ft_in1k"
 
-BACKBONE_BACKENDS = {"torchvision", "timm", "hf_vit", "clip", "custom"}
+BACKBONE_BACKENDS = {"torchvision", "timm", "hf_vit", "hf_auto_vision", "clip", "custom"}
 FEATURE_TYPES = {"spatial", "token", "flat"}
 RANDOM_POOLING_STRATEGIES = {
     "spatial_shared",
@@ -128,7 +128,8 @@ class BackboneConfig:
         backend = str(cfg.backend).strip().lower()
         if backend not in BACKBONE_BACKENDS:
             raise ValueError(
-                "backbone.backend must be torchvision, timm, hf_vit, clip, or custom."
+                "backbone.backend must be torchvision, timm, hf_vit, "
+                "hf_auto_vision, clip, or custom."
             )
         name = str(cfg.name).strip()
         if not name:
@@ -171,6 +172,8 @@ class BackboneConfig:
                 resolved_backend = "clip"
             elif _is_hf_vit_path(name) or _looks_like_hf_vit_name(name):
                 resolved_backend = "hf_vit"
+            elif _looks_like_hf_auto_vision_name(name):
+                resolved_backend = "hf_auto_vision"
             elif checkpoint_path and _is_hf_vit_path(checkpoint_path):
                 resolved_backend = "hf_vit"
             else:
@@ -668,6 +671,150 @@ class _HuggingFaceViTExtractor(nn.Module):
         return tokens
 
 
+def _hf_output_value(output: Any, name: str) -> Any:
+    if isinstance(output, Mapping):
+        return output.get(name)
+    return getattr(output, name, None)
+
+
+def _first_tensor(value: Any) -> Optional[torch.Tensor]:
+    if torch.is_tensor(value):
+        return value
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            tensor = _first_tensor(item)
+            if tensor is not None:
+                return tensor
+    return None
+
+
+def _tensor_from_hf_output(output: Any, names: tuple[str, ...]) -> Optional[torch.Tensor]:
+    for name in names:
+        tensor = _first_tensor(_hf_output_value(output, name))
+        if tensor is not None:
+            return tensor
+    return _first_tensor(output)
+
+
+def _infer_hf_vision_features(model: nn.Module, feature_type: str) -> int:
+    candidates = []
+    for obj in (
+        getattr(getattr(model, "config", None), "vision_config", None),
+        getattr(getattr(model, "vision_model", None), "config", None),
+        getattr(model, "config", None),
+    ):
+        if obj is None:
+            continue
+        if feature_type == "flat":
+            candidates.extend(
+                [
+                    getattr(obj, "projection_dim", None),
+                    getattr(obj, "hidden_size", None),
+                    getattr(obj, "embed_dim", None),
+                ]
+            )
+        else:
+            candidates.extend(
+                [
+                    getattr(obj, "hidden_size", None),
+                    getattr(obj, "embed_dim", None),
+                    getattr(obj, "projection_dim", None),
+                ]
+            )
+    for value in candidates:
+        if value is not None and int(value) > 0:
+            return int(value)
+    return 0
+
+
+class _HFAutoVisionExtractor(nn.Module):
+    """Generic HuggingFace vision extractor for models loaded by AutoModel."""
+
+    def __init__(self, config: BackboneConfig):
+        super().__init__()
+        try:
+            from transformers import AutoModel
+        except Exception as exc:
+            raise RuntimeError(
+                "transformers is required for hf_auto_vision backbones."
+            ) from exc
+        model_name = config.checkpoint or config.name
+        self.model = AutoModel.from_pretrained(model_name, **dict(config.kwargs))
+        self.feature_type = config.pooling.feature_type
+        self.in_features = int(
+            config.in_features
+            or _infer_hf_vision_features(self.model, self.feature_type)
+        )
+        if self.in_features <= 0:
+            raise ValueError("Could not infer HuggingFace AutoModel vision dimension.")
+
+    def _vision_output(self, x: torch.Tensor) -> Any:
+        if self.feature_type == "flat" and hasattr(self.model, "get_image_features"):
+            return self.model.get_image_features(pixel_values=x)
+        vision_model = getattr(self.model, "vision_model", None)
+        if vision_model is not None:
+            return vision_model(pixel_values=x)
+        if hasattr(self.model, "get_image_features"):
+            return self.model.get_image_features(pixel_values=x)
+        return self.model(pixel_values=x)
+
+    def _token_features(self, features: torch.Tensor) -> torch.Tensor:
+        if features.dim() == 4:
+            batch, channels, height, width = features.shape
+            return features.reshape(batch, channels, height * width).transpose(1, 2)
+        if features.dim() == 2:
+            return features.unsqueeze(1)
+        if features.dim() != 3:
+            raise ValueError(
+                "Expected HuggingFace AutoModel features [B, L, C], [B, C, H, W], "
+                f"or [B, C], got {tuple(features.shape)}"
+            )
+        if features.size(1) > 1:
+            candidate = features[:, 1:, :]
+            grid_size = int(round(float(candidate.size(1)) ** 0.5))
+            if grid_size * grid_size == candidate.size(1):
+                return candidate
+        return features
+
+    def _flat_features(self, features: torch.Tensor) -> torch.Tensor:
+        if features.dim() == 2:
+            return features
+        if features.dim() == 3:
+            return features.mean(dim=1)
+        if features.dim() == 4:
+            return features.mean(dim=(2, 3))
+        raise ValueError(
+            f"Expected flat-compatible HuggingFace features, got {tuple(features.shape)}"
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        output = self._vision_output(x)
+        if self.feature_type == "flat":
+            features = _tensor_from_hf_output(
+                output,
+                ("image_embeds", "pooler_output", "last_hidden_state"),
+            )
+            if features is None:
+                raise ValueError("HuggingFace AutoModel output contains no tensor.")
+            return self._flat_features(features)
+        features = _tensor_from_hf_output(
+            output,
+            ("last_hidden_state", "image_embeds", "pooler_output"),
+        )
+        if features is None:
+            raise ValueError("HuggingFace AutoModel output contains no tensor.")
+        if self.feature_type == "token":
+            return self._token_features(features)
+        if self.feature_type == "spatial":
+            if features.dim() != 4:
+                raise ValueError(
+                    "hf_auto_vision spatial pooling expects [B, C, H, W] features, "
+                    f"got {tuple(features.shape)}"
+                )
+            return features
+        raise ValueError(f"Unsupported hf_auto_vision feature type: {self.feature_type}")
+
+
 class _ClipVisionExtractor(nn.Module):
     def __init__(self, config: BackboneConfig):
         super().__init__()
@@ -820,6 +967,36 @@ class HuggingFaceViTBackbone(PoolableBackbone):
         super().__init__(extractor, config)
 
 
+class HFAutoVisionBackbone(PoolableBackbone):
+    """Generic HuggingFace vision backbone loaded with transformers.AutoModel."""
+
+    def __init__(
+        self,
+        model_name_or_path: str,
+        in_features: Optional[int] = None,
+        *,
+        pretrained: bool = True,
+        kwargs: Optional[Mapping[str, Any]] = None,
+        pooling: Optional[Mapping[str, Any]] = None,
+    ):
+        if not pretrained:
+            raise ValueError(
+                "hf_auto_vision requires pretrained=True; pass a local model path "
+                "as name/checkpoint for offline weights."
+            )
+        config = BackboneConfig.legacy(
+            model_name_or_path,
+            backend="hf_auto_vision",
+            pretrained=True,
+            in_features=in_features,
+            checkpoint_path=None,
+            kwargs=kwargs,
+            pooling=pooling,
+        )
+        extractor = _HFAutoVisionExtractor(config)
+        super().__init__(extractor, config)
+
+
 class ClipVisionBackbone(PoolableBackbone):
     def __init__(
         self,
@@ -891,6 +1068,11 @@ def _looks_like_hf_vit_name(name: str) -> bool:
     }
 
 
+def _looks_like_hf_auto_vision_name(name: str) -> bool:
+    lower = name.lower()
+    return lower.startswith("google/siglip") or lower.startswith("google/siglip2")
+
+
 def build_backbone(
     config_or_name: Union[BackboneConfig, Mapping[str, Any], str],
     *,
@@ -954,6 +1136,14 @@ def build_backbone(
         return HuggingFaceViTBackbone(
             config.checkpoint or config.name,
             in_features=config.in_features,
+            pooling=config.pooling.as_dict(),
+        )
+    if config.backend == "hf_auto_vision":
+        return HFAutoVisionBackbone(
+            config.checkpoint or config.name,
+            pretrained=config.pretrained,
+            in_features=config.in_features,
+            kwargs=config.kwargs,
             pooling=config.pooling.as_dict(),
         )
     if config.backend == "clip":

@@ -22,6 +22,8 @@ class TrainingResult:
     best_cwc_labels: Optional[np.ndarray] = None
     final_model_state: Optional[Dict[str, torch.Tensor]] = None
     config: Dict[str, Any] = field(default_factory=dict)
+    early_stopped: bool = False
+    early_stop_step: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -34,6 +36,8 @@ class TrainingResult:
             "has_labels": self.labels is not None,
             "has_best_cwc_predictions": self.best_cwc_predictions is not None,
             "has_best_cwc_labels": self.best_cwc_labels is not None,
+            "early_stopped": self.early_stopped,
+            "early_stop_step": self.early_stop_step,
             "config": self.config,
         }
 

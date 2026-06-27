@@ -14,10 +14,13 @@ from fps_uda.adapters.datasets import (
 
 PRESETS = [
     "configs/datasets/office31_resnet.yaml",
+    "configs/datasets/office31_siglip2.yaml",
     "configs/datasets/office31_vit.yaml",
     "configs/datasets/office_home_resnet.yaml",
+    "configs/datasets/office_home_siglip2.yaml",
     "configs/datasets/office_home_vit.yaml",
     "configs/datasets/visda17_resnet.yaml",
+    "configs/datasets/visda17_siglip2.yaml",
     "configs/datasets/visda17_vit.yaml",
 ]
 
@@ -140,13 +143,20 @@ def test_dataset_presets_parse_without_identity_behavior_fields():
         assert config.feature_bank.views
         assert config.domains
         assert config.transform.mean
-        assert config.backbone.backend in {"torchvision", "timm"}
+        assert config.backbone.backend in {"torchvision", "timm", "hf_auto_vision"}
         if preset.endswith("_resnet.yaml"):
             assert config.backbone.pooling.feature_type == "spatial"
             assert config.backbone.pooling.random_strategy == "spatial_shared"
         if preset.endswith("_vit.yaml"):
             assert config.backbone.pooling.feature_type == "token"
             assert config.backbone.pooling.random_strategy == "token_channel_squared"
+        if preset.endswith("_siglip2.yaml"):
+            assert config.backbone.backend == "hf_auto_vision"
+            assert config.backbone.name == "google/siglip2-so400m-patch14-384"
+            assert config.backbone.in_features == 1152
+            assert config.backbone.pooling.feature_type == "token"
+            assert config.backbone.pooling.random_strategy == "token_channel_squared"
+            assert all(view["input_size"] == 384 for view in config.feature_bank.views)
         assert not Path(config.root_dir).is_absolute()
 
 

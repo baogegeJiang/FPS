@@ -6,6 +6,7 @@ import torch
 
 from fps_uda.models.backbones import (
     BackboneConfig,
+    HFAutoVisionBackbone,
     PoolableBackbone,
     ResNetBackbone,
     TimmVisionBackbone,
@@ -221,6 +222,88 @@ def test_timm_loader_uses_explicit_kwargs_and_checkpoint(monkeypatch):
             },
         )
     ]
+
+
+def test_hf_auto_vision_loader_uses_automodel_tokens(monkeypatch):
+    calls = []
+
+    class FakeVisionModel(torch.nn.Module):
+        config = SimpleNamespace(hidden_size=6)
+
+        def forward(self, pixel_values):
+            batch = pixel_values.shape[0]
+            tokens = torch.arange(
+                batch * 5 * 6,
+                dtype=pixel_values.dtype,
+                device=pixel_values.device,
+            ).reshape(batch, 5, 6)
+            return SimpleNamespace(last_hidden_state=tokens)
+
+    class FakeAutoModel(torch.nn.Module):
+        config = SimpleNamespace(vision_config=SimpleNamespace(hidden_size=6))
+
+        def __init__(self):
+            super().__init__()
+            self.vision_model = FakeVisionModel()
+
+        @classmethod
+        def from_pretrained(cls, name, **kwargs):
+            calls.append((name, kwargs))
+            return cls()
+
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(AutoModel=FakeAutoModel))
+
+    config = BackboneConfig.from_mapping(
+        {
+            "backend": "hf_auto_vision",
+            "name": "google/siglip2-so400m-patch14-384",
+            "pretrained": True,
+            "kwargs": {"trust_remote_code": False},
+            "pooling": {
+                "feature_type": "token",
+                "random_strategy": "token_channel_squared",
+            },
+        }
+    )
+    backbone = build_backbone(config)
+
+    assert isinstance(backbone, HFAutoVisionBackbone)
+    assert backbone.in_features == 6
+    assert calls == [("google/siglip2-so400m-patch14-384", {"trust_remote_code": False})]
+    pooled = backbone(torch.zeros(2, 3, 8, 8), random_pool=False)
+    assert pooled.shape == (2, 6)
+
+
+def test_hf_auto_vision_legacy_detects_google_siglip2(monkeypatch):
+    seen = {}
+
+    def fake_init(
+        self,
+        model_name_or_path,
+        in_features=None,
+        *,
+        pretrained=True,
+        kwargs=None,
+        pooling=None,
+    ):
+        torch.nn.Module.__init__(self)
+        seen["model_name_or_path"] = model_name_or_path
+        seen["pretrained"] = pretrained
+        seen["pooling"] = pooling
+
+    monkeypatch.setattr(HFAutoVisionBackbone, "__init__", fake_init)
+
+    backbone = build_backbone("google/siglip2-so400m-patch14-384")
+
+    assert isinstance(backbone, HFAutoVisionBackbone)
+    assert seen == {
+        "model_name_or_path": "google/siglip2-so400m-patch14-384",
+        "pretrained": True,
+        "pooling": {
+            "feature_type": "token",
+            "random_strategy": "token_channel_squared",
+        },
+    }
 
 
 def test_build_resnet_backbone_forwards_checkpoint_path(monkeypatch, tmp_path):

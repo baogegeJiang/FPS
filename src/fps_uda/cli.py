@@ -341,7 +341,7 @@ def _parse_backbone_kwargs(values: Optional[Iterable[str]]) -> dict:
 def _default_pooling_for_backend(backend: Optional[str]) -> Optional[dict]:
     if backend == "torchvision":
         return {"feature_type": "spatial", "random_strategy": "spatial_shared"}
-    if backend in {"timm", "hf_vit", "clip"}:
+    if backend in {"timm", "hf_vit", "hf_auto_vision", "clip"}:
         return {
             "feature_type": "token",
             "random_strategy": "token_channel_squared",
@@ -469,7 +469,11 @@ def build_parser() -> argparse.ArgumentParser:
     bank.add_argument("--dataset-config", type=str, required=True)
     bank.add_argument("--dataset-root", type=str, default=None)
     bank.add_argument("--domains", type=str, nargs="+", default=None)
-    bank.add_argument("--backend", choices=["torchvision", "timm", "hf_vit", "clip"], default=None)
+    bank.add_argument(
+        "--backend",
+        choices=["torchvision", "timm", "hf_vit", "hf_auto_vision", "clip"],
+        default=None,
+    )
     bank.add_argument("--backbone", type=str, default=None)
     bank.add_argument("--weights", type=str, default=None)
     bank.add_argument("--checkpoint", type=str, default=None)

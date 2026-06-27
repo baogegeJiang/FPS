@@ -61,6 +61,9 @@ class FPSConfig:
     multi_class: bool = True
     eval_interval: int = 100
     progress: bool = True
+    early_stop_metric: str = "acc"
+    early_stop_patience: Optional[int] = None
+    early_stop_min_delta: float = 0.0
     sample_entropy_type: str = "shannon"
     tsallis_q: float = 1.5
     legacy_loss_mode: bool = False

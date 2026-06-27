@@ -150,12 +150,12 @@ pip install -e ".[hf]"</code></pre>
       <section id="workflow" class="section">
         <div class="container">
           <p class="eyebrow">CLI Workflow</p>
-          <h2>Feature bank -> analysis -> training -> sweep</h2>
+          <h2>Feature bank -> analysis -> search -> training</h2>
           <div class="workflow">
             <article>
               <span class="step">1</span>
               <h3>Download banks</h3>
-              <pre><code>python scripts/download_feature_banks.py all</code></pre>
+              <pre><code>PYTHONPATH=src python scripts/download_feature_banks.py all</code></pre>
               <p>
                 Downloads released H5 banks from the Hugging Face dataset repo.
                 The default endpoint mode automatically falls back to
@@ -168,7 +168,7 @@ pip install -e ".[hf]"</code></pre>
             <article>
               <span class="step">2</span>
               <h3>Extract features</h3>
-              <pre><code>fps-uda extract-feature-bank \
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
   --dataset-config configs/datasets/office31_vit.yaml \
   --out fps_h5cache/banks/office31_vit.h5 \
   --device cuda:0</code></pre>
@@ -177,7 +177,7 @@ pip install -e ".[hf]"</code></pre>
             <article>
               <span class="step">3</span>
               <h3>Analyze views</h3>
-              <pre><code>fps-uda analyze-feature-bank \
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank \
   --feature-bank fps_h5cache/banks/office31_vit.h5 \
   --source-domain amazon \
   --target-domain webcam \
@@ -186,12 +186,27 @@ pip install -e ".[hf]"</code></pre>
             </article>
             <article>
               <span class="step">4</span>
+              <h3>Search configs</h3>
+              <pre><code>PYTHONPATH=src BACKBONES="resnet vit siglip2" DEVICE=cuda:0 \
+  bash scripts/search_training_configs.sh</code></pre>
+              <p>
+                Autosearched YAML files are written to
+                <code>configs/training_autosearch/.../{suffix}.yaml</code>.
+                Each search summary starts with <code>source_only</code> and
+                <code>target_only</code> supervised baselines using
+                <code>beta=1</code> and <code>beta_0=1</code>. The
+                <code>target_only</code> row is an oracle reference and does not
+                participate in best-config selection.
+              </p>
+            </article>
+            <article>
+              <span class="step">5</span>
               <h3>Train or sweep</h3>
-              <pre><code>fps-uda train \
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
   --config configs/training/office31/amazon_to_webcam/vit.yaml \
   --out runs/office31/amazon_to_webcam/vit
 
-fps-uda sweep \
+PYTHONPATH=src python -m fps_uda.cli sweep \
   --config configs/training/office31/amazon_to_webcam/vit.yaml \
   --alpha-grid 0.6,0.8,1.0 \
   --beta-grid 0.4,0.6 \
@@ -277,6 +292,9 @@ fps-uda sweep \
               <p>
                 Declares domain manifests, image normalization, deterministic
                 view geometry, backbone backend, and pooling strategy.
+                Per-view <code>random_pooling_count</code> controls how many
+                <code>pool_a</code>, <code>pool_b</code>, ... views are written;
+                it defaults to <code>2</code>.
               </p>
             </article>
             <article class="item">
@@ -284,8 +302,29 @@ fps-uda sweep \
               <p>
                 ResNet presets use torchvision weights and spatial shared
                 random pooling. ViT presets use timm and token-channel squared
-                random pooling.
+                random pooling. HuggingFace AutoModel vision backbones can be
+                selected with <code>hf_auto_vision</code>; this is the backend
+                used by the SigLIP 2 presets.
               </p>
+            </article>
+            <article class="item">
+              <h3>SigLIP 2 AutoModel</h3>
+              <p>
+                Presets such as <code>configs/datasets/office_home_siglip2.yaml</code>
+                use <code>google/siglip2-so400m-patch14-384</code> through
+                HuggingFace <code>AutoModel</code>.
+              </p>
+              <pre><code>backbone:
+  backend: hf_auto_vision
+  name: google/siglip2-so400m-patch14-384
+  in_features: 1152
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared</code></pre>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
+  --dataset-config configs/datasets/office_home_siglip2.yaml \
+  --out fps_h5cache/banks/office_home_siglip2.h5 \
+  --device cuda:0</code></pre>
             </article>
             <article class="item">
               <h3>Packaged example</h3>

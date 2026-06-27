@@ -67,3 +67,20 @@ def test_direct_resolve_url_encodes_revision_and_file_path():
         "refs/pr/1",
         "dir/file with space.h5",
     ) == "https://huggingface.co/org/model/resolve/refs%2Fpr%2F1/dir/file%20with%20space.h5"
+
+
+def test_materialize_file_resolves_hf_snapshot_relative_symlink(tmp_path):
+    module = _load_script_module()
+    blob = tmp_path / "models--org--repo" / "blobs" / "abc123"
+    snapshot_dir = tmp_path / "models--org--repo" / "snapshots" / "rev" / "banks"
+    cache_link = snapshot_dir / "bank.h5"
+    output_path = tmp_path / "fps_h5cache" / "banks" / "bank.h5"
+    blob.parent.mkdir(parents=True)
+    snapshot_dir.mkdir(parents=True)
+    blob.write_bytes(b"fake h5 bytes")
+    cache_link.symlink_to("../../../blobs/abc123")
+
+    module.materialize_file(cache_link, output_path, force=False)
+
+    assert output_path.read_bytes() == b"fake h5 bytes"
+    assert not output_path.is_symlink()

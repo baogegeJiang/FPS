@@ -161,7 +161,7 @@ It keeps all `amazon` and `webcam` samples and the views used by
 Regenerate it from the full Office31 ViT bank with:
 
 ```bash
-python scripts/make_smoke_feature_bank.py --force
+PYTHONPATH=src python scripts/make_smoke_feature_bank.py --force
 ```
 
 ## Core Concepts
@@ -209,10 +209,10 @@ Each role has:
 FPS-UDA exposes four CLI commands:
 
 ```bash
-fps-uda extract-feature-bank
-fps-uda analyze-feature-bank
-fps-uda train
-fps-uda sweep
+PYTHONPATH=src python -m fps_uda.cli extract-feature-bank
+PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank
+PYTHONPATH=src python -m fps_uda.cli train
+PYTHONPATH=src python -m fps_uda.cli sweep
 ```
 
 Use `PYTHONPATH=src python -m fps_uda.cli ...` instead of `fps-uda ...` when the
@@ -224,7 +224,7 @@ Benchmark banks can be downloaded from the Hugging Face dataset repo
 `baogege1995/FPS_H5`. Files are stored under the `banks/` subdirectory.
 
 ```bash
-python scripts/download_feature_banks.py all
+PYTHONPATH=src python scripts/download_feature_banks.py all
 ```
 
 The downloader defaults to `--endpoint auto`: it tries `HF_ENDPOINT` if already
@@ -232,7 +232,7 @@ set, then `https://huggingface.co`, and finally `https://hf-mirror.com`. To forc
 the domestic mirror:
 
 ```bash
-python scripts/download_feature_banks.py all --endpoint hf-mirror
+PYTHONPATH=src python scripts/download_feature_banks.py all --endpoint hf-mirror
 ```
 
 If Hub metadata lookup fails on a mirror, the script falls back to direct
@@ -241,7 +241,7 @@ If Hub metadata lookup fails on a mirror, the script falls back to direct
 Download a subset:
 
 ```bash
-python scripts/download_feature_banks.py office31_resnet office_home_vit
+PYTHONPATH=src python scripts/download_feature_banks.py office31_resnet office_home_vit
 ```
 
 Banks are written to:
@@ -255,15 +255,15 @@ fps_h5cache/banks/
 Use helper scripts to download datasets and generate manifests:
 
 ```bash
-python scripts/download_datasets.py office31 --root data
-python scripts/download_datasets.py office_home --root data
-python scripts/download_datasets.py visda17 --root data
+PYTHONPATH=src python scripts/download_datasets.py office31 --root data
+PYTHONPATH=src python scripts/download_datasets.py office_home --root data
+PYTHONPATH=src python scripts/download_datasets.py visda17 --root data
 ```
 
 For existing local copies:
 
 ```bash
-python scripts/download_datasets.py all --root data --skip-download
+PYTHONPATH=src python scripts/download_datasets.py all --root data --skip-download
 ```
 
 Generated manifests:
@@ -282,7 +282,7 @@ Download URLs can be overridden with `--office31-url`, `--office-home-url`,
 Dataset YAML controls domains, transforms, backbone, and feature-bank views:
 
 ```bash
-fps-uda extract-feature-bank \
+PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
   --dataset-config configs/datasets/office31_vit.yaml \
   --out fps_h5cache/banks/office31_vit.h5 \
   --device cuda:0 \
@@ -292,6 +292,7 @@ fps-uda extract-feature-bank \
 Regenerate all benchmark banks:
 
 ```bash
+PYTHONPATH=src \
 PYTHON_BIN=python \
 DEVICE=cuda:0 \
 NUM_WORKERS=16 \
@@ -301,7 +302,7 @@ bash scripts/extract_benchmark_feature_banks.sh
 Override the backbone from the CLI:
 
 ```bash
-fps-uda extract-feature-bank \
+PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
   --dataset-config configs/datasets/office_home_resnet.yaml \
   --backend torchvision \
   --backbone resnet101 \
@@ -314,7 +315,7 @@ fps-uda extract-feature-bank \
 Analysis uses labels for debugging and view selection. It does not modify H5.
 
 ```bash
-fps-uda analyze-feature-bank \
+PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank \
   --feature-bank fps_h5cache/banks/office_home_resnet50.h5 \
   --source-domain Art \
   --target-domain Product \
@@ -329,7 +330,7 @@ is installed.
 Train from a YAML config:
 
 ```bash
-fps-uda train \
+PYTHONPATH=src python -m fps_uda.cli train \
   --config configs/training/office31/amazon_to_webcam/vit.yaml \
   --out runs/office31/amazon_to_webcam/vit
 ```
@@ -337,7 +338,7 @@ fps-uda train \
 Override common settings from the CLI:
 
 ```bash
-fps-uda train \
+PYTHONPATH=src python -m fps_uda.cli train \
   --config configs/training/office31/amazon_to_webcam/vit.yaml \
   --device cuda:0 \
   --iter-num 1000 \
@@ -349,7 +350,7 @@ fps-uda train \
 Train without a config by specifying the bank and view roles:
 
 ```bash
-fps-uda train \
+PYTHONPATH=src python -m fps_uda.cli train \
   --feature-bank fps_h5cache/banks/office31_vit.h5 \
   --source-domain amazon \
   --target-domain webcam \
@@ -370,13 +371,60 @@ fps-uda train \
 Run alpha/beta sweeps:
 
 ```bash
-fps-uda sweep \
+PYTHONPATH=src python -m fps_uda.cli sweep \
   --config configs/training/office31/amazon_to_webcam/vit.yaml \
   --alpha-grid 0.6,0.8,1.0 \
   --beta-grid 0.4,0.6 \
   --seeds 0 1 2 \
   --out runs/sweeps/office31_aw_vit
 ```
+
+### Hyperparameter Search
+
+For a new feature bank task, use the search helper to select clean views,
+infer `num_classes`, search common LR/alpha/beta/LCR/margin settings, and write
+a runnable training YAML:
+
+```bash
+PYTHONPATH=src python scripts/search_fps_hyperparams.py \
+  --feature-bank fps_h5cache/banks/office31_vit.h5 \
+  --source-domain amazon \
+  --target-domain webcam \
+  --out runs/search/office31_amazon_to_webcam_vit \
+  --device cuda:0
+```
+
+Outputs include `best.yaml`, `selected_views.yaml`, `search_summary.csv`, and
+`search_summary.json`. The default search metric is `acc`; use `--metric cwc`
+to optimize class-wise accuracy instead. Each search starts by recording
+`source_only` and `target_only` supervised baselines in the summary. Both use
+`beta=1` and `beta_0=1` with consistency losses disabled; `target_only` is an
+oracle reference that temporarily uses target labels as the supervised domain.
+These rows are references and do not participate in best-config selection.
+
+For a batch example, run all Office31, OfficeHome, and VisDA17 tasks for one or
+more feature-bank suffixes and copy each searched config into
+`configs/training_autosearch/.../{suffix}.yaml`:
+
+```bash
+PYTHONPATH=src BACKBONES="resnet vit siglip2" DEVICE=cuda:0 \
+  bash scripts/search_training_configs.sh
+```
+
+The raw search logs stay under `runs/search_configs/{suffix}/`. Use environment
+variables to narrow or customize the search:
+
+```bash
+PYTHONPATH=src BACKBONES=vit DATASETS=office31 TASKS=amazon_to_webcam DRY_RUN=1 \
+  bash scripts/search_training_configs.sh
+
+PYTHONPATH=src SEARCH_SPACE=configs/search/default_search_space.yaml \
+  SUFFIXES=siglip2 METRIC=cwc ROUNDS=2 ITER_NUM=1000 \
+  bash scripts/search_training_configs.sh
+```
+
+`SEARCH_SPACE` can point to your own YAML with a different `basic` template, LR
+candidates, `lambda_lcr_grid`, or `margin_candidates`.
 
 ## Training YAML
 
@@ -585,7 +633,7 @@ feature_bank:
 | Section | Field | Meaning |
 | --- | --- | --- |
 | root | `root_dir` | dataset root used by domain paths |
-| `backbone` | `backend` | `torchvision`, `timm`, `hf_vit`, or `clip` |
+| `backbone` | `backend` | `torchvision`, `timm`, `hf_vit`, `hf_auto_vision`, or `clip` |
 | `backbone` | `name` | model name passed to the backend |
 | `backbone` | `weights` | torchvision weights enum name, when applicable |
 | `backbone` | `checkpoint` | optional local checkpoint path |
@@ -599,9 +647,57 @@ feature_bank:
 | `feature_bank` | `water_level` | random pooling water level |
 | `feature_bank` | `mute_padding_in_pool` | exclude padding from pooling masks when possible |
 | `feature_bank.views` | `pad_to_square`, `resize_size`, `input_size`, `crop`, `flip` | deterministic view geometry |
+| `feature_bank.views` | `random_pooling_count` | optional number of random pooling views per base view; defaults to `2` |
 
 For each configured base view, extraction writes `clean` plus random pooling
-views such as `pool_a` and `pool_b`.
+views. With the default `random_pooling_count: 2`, a base key such as
+`pad_resize256_input224_center_orig` expands to:
+
+```text
+pad_resize256_input224_center_orig_clean
+pad_resize256_input224_center_orig_pool_a
+pad_resize256_input224_center_orig_pool_b
+```
+
+Set `random_pooling_count: 0` to write only `clean`, or a larger value to write
+additional keys such as `pool_c`, `pool_d`, and so on.
+
+For HuggingFace vision models that are not plain `ViTModel` or `CLIPModel`
+instances, use the generic AutoModel backend. For example, SigLIP 2 So400m can
+be configured as:
+
+```yaml
+backbone:
+  backend: hf_auto_vision
+  name: google/siglip2-so400m-patch14-384
+  pretrained: true
+  weights: null
+  checkpoint: null
+  in_features: 1152
+  kwargs: {}
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared
+transform:
+  interpolation: bicubic
+  antialias: true
+  pad_fill: 127
+  mean: [0.5, 0.5, 0.5]
+  std: [0.5, 0.5, 0.5]
+```
+
+Use 384-sized deterministic views for this model family, for example
+`resize_size: 384` and `input_size: 384`.
+
+Ready-to-run SigLIP 2 extraction presets are included for Office31, OfficeHome,
+and VisDA17:
+
+```bash
+PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
+  --dataset-config configs/datasets/office_home_siglip2.yaml \
+  --out fps_h5cache/banks/office_home_siglip2.h5 \
+  --device cuda:0
+```
 
 ## Python API
 
@@ -706,6 +802,7 @@ and writes a standard FPS-UDA feature bank. A custom model may return:
 Run every benchmark Office31, OfficeHome, and VisDA17 config:
 
 ```bash
+PYTHONPATH=src \
 PYTHON_BIN=python \
 DEVICE=cuda:0 \
 RESUME=1 \
@@ -716,8 +813,8 @@ bash scripts/run_benchmarks.sh
 Useful filters:
 
 ```bash
-DATASETS=office31 BACKBONES=vit DRY_RUN=1 bash scripts/run_benchmarks.sh
-TASKS=amazon_to_webcam ITER_NUM=1000 bash scripts/run_benchmarks.sh
+PYTHONPATH=src DATASETS=office31 BACKBONES=vit DRY_RUN=1 bash scripts/run_benchmarks.sh
+PYTHONPATH=src TASKS=amazon_to_webcam ITER_NUM=1000 bash scripts/run_benchmarks.sh
 ```
 
 Historical tex-table comparison helpers and local run outputs are archived under

@@ -1,0 +1,192 @@
+basic:
+    io:
+        feature_transform: none
+        device: cuda:0
+    views: {}
+    optimization:
+        optimizer: sgd
+        base_lr: 0.000375
+        momentum: 0.9
+        nesterov: false
+        weight_decay: 0.0
+        lr_schedule: linear_step
+        min_lr: 0.0
+    schedule:
+        seed: 0
+        iter_num: 3000
+        alpha: 0.85
+        beta: 0.9
+        alpha_0: 0.1
+        beta_0: 0.1
+        schedule_tau: 1000
+        dynamic_parameters: true
+    normalization:
+        normalize: cross_norm
+        cross_norm_scale: 1
+        cross_norm_target_weight: 0.5
+        self_norm_scale_src: 1
+        self_norm_scale_tgt: 1
+    losses:
+        use_consistency_loss: true
+        use_correction: false
+        use_shift_constraint: false
+        use_classes_weight: true
+        baseline: false
+        use_lse: true
+        use_lce: true
+        use_lcr: true
+        lambda_lcr: 0.55
+        lcr_loss: mse
+        lcr_sample_weight: paper
+        pseudo_margin: true
+        margin_start_step: 100
+        use_temperature: false
+        begin_temperature: 30
+        use_geom_test: false
+        geom_alpha: 1
+        geom_beta: 1
+        sparse_weight_a: 5
+        sample_entropy_type: shannon
+        margin_quantile: 0.01
+        margin_weight_type: normalized_logit_gap
+        margin_convert_mode: quantile_sigmoid
+        margin_sigmoid_tau: 0.2
+        margin_sigmoid_boundary_weight: 0.9
+    eval:
+        multi_class: true
+        eval_interval: 100
+        progress: false
+
+lr_candidates:
+    - {
+          feature_transform: none,
+          base_lr: 0.000375,
+          optimizer: sgd,
+          lr_schedule: linear_step,
+          min_lr: 0.0,
+      }
+    - {
+          feature_transform: sqrt,
+          base_lr: 0.003,
+          optimizer: sgd,
+          lr_schedule: linear_step,
+          min_lr: 0.0,
+      }
+    - {
+          feature_transform: sqrt,
+          base_lr: 0.005,
+          optimizer: sgd,
+          lr_schedule: linear_step,
+          min_lr: 0.0,
+      }
+    - {
+          feature_transform: sqrt,
+          base_lr: 0.00125,
+          optimizer: sgd,
+          lr_schedule: linear_step,
+          min_lr: 0.0,
+      }
+    - {
+          feature_transform: none,
+          base_lr: 0.001,
+          optimizer: adamw,
+          lr_schedule: cosine,
+          min_lr: 0.0,
+      }
+    - {
+          feature_transform: none,
+          base_lr: 0.0005,
+          optimizer: sgd,
+          lr_schedule: linear_step,
+          min_lr: 0.0,
+      }
+
+lambda_lcr_grid:
+    - 0.1
+    - 0.2
+    - 0.3
+    - 0.4
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+    - 1.0
+    - 1.2
+    - 1.5
+    - 2.0
+    - 2.5
+    - 3.0
+    - 3.5
+    - 4.0
+    - 5.0
+    - 7.5
+    - 10.0
+    - 12.5
+    - 15.0
+    - 20.0
+
+margin_candidates:
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.01,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.9,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.15,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.2,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.01,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.8,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.01,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: by_type,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.5,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.01,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.5,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.01,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.2,
+          margin_start_step: 100,
+      }
+    - {
+          pseudo_margin: true,
+          margin_quantile: 0.25,
+          margin_weight_type: normalized_logit_gap,
+          margin_convert_mode: quantile_sigmoid,
+          margin_sigmoid_tau: 0.2,
+          margin_sigmoid_boundary_weight: 0.2,
+          margin_start_step: 100,
+      }

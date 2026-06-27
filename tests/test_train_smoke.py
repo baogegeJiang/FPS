@@ -80,6 +80,33 @@ def test_train_fps_records_invr_when_true_class_r_is_zero():
     assert result.history[0]["invR"] == 0.0
 
 
+def test_train_fps_early_stops_after_patience(monkeypatch):
+    def fake_evaluate(model, data, config):
+        labels = data.eval_labels.detach().cpu().numpy()
+        predictions = np.zeros((labels.shape[0], config.num_classes), dtype="float32")
+        return {"acc": 0.5, "class_wise_acc": 0.5}, predictions, labels
+
+    monkeypatch.setattr(trainer_module, "_evaluate", fake_evaluate)
+    config = FPSConfig(
+        num_classes=2,
+        feature_dim=4,
+        device="cpu",
+        base_lr=0.01,
+        iter_num=5,
+        eval_interval=1,
+        progress=False,
+        early_stop_metric="acc",
+        early_stop_patience=1,
+    )
+
+    result = train_fps(_features(seed=19), config)
+
+    assert result.early_stopped is True
+    assert result.early_stop_step == 1.0
+    assert len(result.history) == 2
+    assert result.history[-1]["early_stopped"] == 1.0
+
+
 def test_train_fps_uses_configured_momentum(monkeypatch):
     captured = {}
     original_sgd = torch.optim.SGD

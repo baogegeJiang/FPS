@@ -1,0 +1,38 @@
+name: office_home_siglip2
+root_dir: data/office_home
+backbone:
+  backend: hf_auto_vision
+  name: google/siglip2-so400m-patch14-384
+  pretrained: true
+  weights: null
+  checkpoint: null
+  in_features: 1152
+  kwargs: {}
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared
+loader:
+  batch_size: 4
+  num_workers: 16
+  seed: 515
+  strong_aug: false
+  distributed: false
+  pin_memory: true
+  drop_last: false
+transform:
+  interpolation: bicubic
+  antialias: true
+  pad_fill: 127
+  mean: [0.5, 0.5, 0.5]
+  std: [0.5, 0.5, 0.5]
+domains:
+  - {name: Art, kind: manifest, image_root: Art, manifest: Art/annotations/annotations.txt, path_column: 0, label_column: 1}
+  - {name: Clipart, kind: manifest, image_root: Clipart, manifest: Clipart/annotations/annotations.txt, path_column: 0, label_column: 1}
+  - {name: Product, kind: manifest, image_root: Product, manifest: Product/annotations/annotations.txt, path_column: 0, label_column: 1}
+  - {name: "Real World", kind: manifest, image_root: "Real World", manifest: "Real World/annotations/annotations.txt", path_column: 0, label_column: 1}
+feature_bank:
+  water_level: 0.0
+  mute_padding_in_pool: true
+  views:
+    - {key: pad_resize384_input384_direct_orig, pad_to_square: true, resize_size: 384, input_size: 384, crop: direct, flip: orig,random_pooling_count:4}
+    - {key: pad_resize384_input384_direct_hflip, pad_to_square: true, resize_size: 384, input_size: 384, crop: direct, flip: hflip,random_pooling_count:4}

@@ -225,25 +225,34 @@ def download_direct_url(url: str, output_path: Path, force: bool) -> None:
 
 def materialize_file(cache_path: str | os.PathLike[str], output_path: Path, force: bool) -> None:
     cache_path = Path(cache_path)
+    try:
+        source_path = cache_path.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f"Downloaded cache path does not resolve to a real file: {cache_path}"
+        ) from exc
+    if not source_path.is_file():
+        raise RuntimeError(f"Downloaded cache path is not a regular file: {source_path}")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    if output_path.exists() and not force:
+    if (output_path.exists() or output_path.is_symlink()) and not force:
         print(f"[skip] {output_path} already exists")
         return
 
     tmp_path = output_path.with_name(output_path.name + ".tmp")
-    if tmp_path.exists():
+    if tmp_path.exists() or tmp_path.is_symlink():
         tmp_path.unlink()
 
     try:
-        os.link(cache_path, tmp_path)
+        os.link(source_path, tmp_path)
         action = "linked"
     except OSError:
-        shutil.copy2(cache_path, tmp_path)
+        shutil.copy2(source_path, tmp_path)
         action = "copied"
 
     tmp_path.replace(output_path)
-    print(f"[ok] {action} {cache_path} -> {output_path}")
+    print(f"[ok] {action} {source_path} -> {output_path}")
 
 
 def download_one(args: argparse.Namespace, key: str, filename: str) -> None:

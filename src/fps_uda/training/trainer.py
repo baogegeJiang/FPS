@@ -89,6 +89,13 @@ def _empty_loss(device: torch.device) -> torch.Tensor:
     return torch.zeros((), device=device)
 
 
+def _early_stop_metric_key(metric: str) -> str:
+    metric = str(metric).strip().lower()
+    if metric in {"cwc", "class_wise_acc", "class-wise-acc"}:
+        return "class_wise_acc"
+    return metric or "acc"
+
+
 def _combine_loss_outputs(
     outputs: list[LossOutput],
     *,
@@ -205,6 +212,13 @@ def train_fps(
     best_cwc_predictions = None
     best_cwc_labels = None
     class_r_true = None
+    early_stop_key = _early_stop_metric_key(config.early_stop_metric)
+    early_stop_patience = config.early_stop_patience
+    early_stop_enabled = early_stop_patience is not None and int(early_stop_patience) >= 0
+    early_stop_best = None
+    early_stop_bad_count = 0
+    early_stopped = False
+    early_stop_step = None
     if data.eval_features is not None and data.eval_labels is not None:
         class_r_true = _class_r_mean(
             data.eval_labels.detach().cpu().numpy(),
@@ -349,9 +363,27 @@ def train_fps(
                 if best_score is not None:
                     postfix["best"] = f"{best_score:.4f}"
                 iterator.set_postfix(postfix)
+            if early_stop_enabled and early_stop_key in row:
+                metric_value = float(row[early_stop_key])
+                if (
+                    early_stop_best is None
+                    or metric_value > early_stop_best + float(config.early_stop_min_delta)
+                ):
+                    early_stop_best = metric_value
+                    early_stop_bad_count = 0
+                else:
+                    early_stop_bad_count += 1
+                row["early_stop_metric"] = metric_value
+                row["early_stop_bad_count"] = float(early_stop_bad_count)
+                if early_stop_bad_count >= int(early_stop_patience):
+                    early_stopped = True
+                    early_stop_step = float(step)
+                    row["early_stopped"] = 1.0
         history.append(row)
         for callback in callbacks:
             callback(step, row)
+        if early_stopped:
+            break
 
     result = TrainingResult(
         best_metric=best_metric if best_score is not None else None,
@@ -365,6 +397,8 @@ def train_fps(
         best_cwc_labels=best_cwc_labels,
         final_model_state={k: v.detach().cpu() for k, v in model.state_dict().items()},
         config=config.to_dict(),
+        early_stopped=early_stopped,
+        early_stop_step=early_stop_step,
     )
     out = output_dir or config.output_dir
     if out is not None:
