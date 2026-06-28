@@ -83,6 +83,20 @@ print_cmd() {
   echo
 }
 
+atomic_copy() {
+  local source_path="$1"
+  local target_path="$2"
+  local target_dir
+  local target_name
+  local tmp_path
+  target_dir="$(dirname "${target_path}")"
+  target_name="$(basename "${target_path}")"
+  mkdir -p "${target_dir}"
+  tmp_path="$(mktemp "${target_dir}/.${target_name}.tmp.XXXXXX")"
+  cp "${source_path}" "${tmp_path}"
+  mv "${tmp_path}" "${target_path}"
+}
+
 record_failure() {
   local message="$1"
   FAILURES+=("${message}")
@@ -212,8 +226,7 @@ run_task() {
     record_failure "${dataset}/${task}/${suffix}: expected output ${best_yaml} was not created"
     return 0
   fi
-  mkdir -p "$(dirname "${config_path}")"
-  cp "${best_yaml}" "${config_path}"
+  atomic_copy "${best_yaml}" "${config_path}"
   echo "    Wrote ${config_path}"
 }
 

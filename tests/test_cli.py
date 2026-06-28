@@ -159,6 +159,16 @@ def test_cli_train_requires_feature_bank(tmp_path):
     assert "--feature-bank is required" in str(exc.value)
 
 
+def test_cli_train_rejects_empty_config_with_clear_error(tmp_path):
+    config_path = tmp_path / "empty.yaml"
+    config_path.write_text("")
+
+    with pytest.raises(SystemExit) as exc:
+        main(["train", "--config", str(config_path), "--out", str(tmp_path / "run")])
+
+    assert "is empty or contains no recognized training sections" in str(exc.value)
+
+
 def test_cli_train_rejects_flat_yaml(tmp_path):
     config_path = tmp_path / "flat.yaml"
     config_path.write_text(yaml.safe_dump({"device": "cpu", "iter_num": 2, "base_lr": 0.01}))

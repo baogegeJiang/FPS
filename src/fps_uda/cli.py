@@ -235,8 +235,21 @@ def _load_training_features(args, config_dict: Mapping[str, object]):
     )
 
 
+def _load_train_config(args) -> dict:
+    if not args.config:
+        return {}
+    config_dict = load_yaml_config(args.config, section=args.section)
+    if not config_dict:
+        raise SystemExit(
+            f"Training config '{args.config}' is empty or contains no recognized "
+            "training sections. If another process is writing this file, rerun "
+            "after that process finishes."
+        )
+    return config_dict
+
+
 def _cmd_train(args) -> int:
-    config_dict = load_yaml_config(args.config, section=args.section) if args.config else {}
+    config_dict = _load_train_config(args)
     features = _load_training_features(args, config_dict)
     config = _infer_config(config_dict, features, args)
     result = train_fps(features, config, output_dir=args.out)
@@ -245,7 +258,7 @@ def _cmd_train(args) -> int:
 
 
 def _cmd_sweep(args) -> int:
-    config_dict = load_yaml_config(args.config, section=args.section) if args.config else {}
+    config_dict = _load_train_config(args)
     features = _load_training_features(args, config_dict)
     base_config = _infer_config(config_dict, features, args)
     output_root = Path(args.out)

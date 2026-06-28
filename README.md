@@ -68,6 +68,13 @@ This open-source library includes code contributions from:
 - [sayori1698](https://github.com/sayori1698)
 - [ZhongH-Qin](https://github.com/ZhongH-Qin)
 
+## Collaboration
+
+We welcome collaborations from researchers and practitioners who would like to
+apply FPS-UDA to other domains or build new feature-bank workflows around this
+method. Please feel free to contact us if your project could benefit from FPS
+or if you are interested in adapting the method together.
+
 ## Install
 
 For the fastest install, use the base package first:

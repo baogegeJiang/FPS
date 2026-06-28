@@ -8,6 +8,7 @@ import json
 import math
 import re
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
@@ -619,12 +620,25 @@ def _write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
         writer.writerows([{key: _json_safe(row.get(key)) for key in fieldnames} for row in rows])
 
 
-def _write_yaml_with_header(path: Path, config: Mapping[str, Any], header: Sequence[str]) -> None:
+def _write_text_atomic(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w",
+        encoding="utf-8",
+        dir=path.parent,
+        prefix=f".{path.name}.tmp.",
+        delete=False,
+    ) as handle:
+        handle.write(text)
+        tmp_name = handle.name
+    Path(tmp_name).replace(path)
+
+
+def _write_yaml_with_header(path: Path, config: Mapping[str, Any], header: Sequence[str]) -> None:
     text = "\n".join(f"# {line}" for line in header)
     text += "\n"
     text += yaml.safe_dump(_json_safe(dict(config)), sort_keys=False, allow_unicode=True)
-    path.write_text(text, encoding="utf-8")
+    _write_text_atomic(path, text)
 
 
 def _final_config_for_output(config: Mapping[str, Any]) -> dict[str, Any]:
@@ -805,9 +819,9 @@ def run_search(args: argparse.Namespace) -> dict[str, Any]:
         "warnings": selected["warnings"],
         "ranked_views": selected["ranked"],
     }
-    (output / "selected_views.yaml").write_text(
+    _write_text_atomic(
+        output / "selected_views.yaml",
         yaml.safe_dump(_json_safe(selected_payload), sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
     )
     _write_csv(output / "search_summary.csv", rows)
     summary = {
@@ -822,10 +836,7 @@ def run_search(args: argparse.Namespace) -> dict[str, Any]:
         },
         "trials": rows,
     }
-    (output / "search_summary.json").write_text(
-        json.dumps(_json_safe(summary), indent=2),
-        encoding="utf-8",
-    )
+    _write_text_atomic(output / "search_summary.json", json.dumps(_json_safe(summary), indent=2))
     # Validate the emitted config before returning.
     load_yaml_config(str(output / "best.yaml"))
     return _json_safe(summary)
