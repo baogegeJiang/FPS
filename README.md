@@ -19,9 +19,9 @@
 </p>
 
 <p align="center">
-  <img alt="Python >=3.9" src="https://img.shields.io/badge/python-%3E%3D3.9-blue">
-  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-feature--space%20training-ee4c2c">
+  <img alt="Python 3.9+" src="https://img.shields.io/badge/python-3.9%2B-blue" />
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green" />
+  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-feature--space%20training-ee4c2c" />
 </p>
 
 ## Overview
