@@ -35,6 +35,12 @@ It separates image feature extraction from feature-space training:
 
 The package name is `fps-uda`; the import name is `fps_uda`.
 
+Documentation pages:
+[Quick Start](https://baogegeJiang.github.io/FPS/quickstart.html),
+[Feature Banks](https://baogegeJiang.github.io/FPS/feature-banks.html),
+[Training](https://baogegeJiang.github.io/FPS/training.html), and
+[Advanced Usage](https://baogegeJiang.github.io/FPS/advanced.html).
+
 ## Paper
 
 This repository accompanies the FPS paper:

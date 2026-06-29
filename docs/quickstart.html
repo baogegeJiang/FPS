@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quick Start | FPS-UDA</title>
+    <meta
+      name="description"
+      content="Install FPS-UDA and run the packaged Office31 H5 smoke example."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a class="active" href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Quick Start</p>
+          <h1>Run FPS-UDA from a packaged H5 in a few commands.</h1>
+          <p class="lead">
+            The repository includes a compressed Office31
+            <code>amazon -> webcam</code> ViT feature bank. It keeps all source
+            and target samples for that task and only the views needed by the
+            example config.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container code-grid">
+          <article>
+            <h2>Install</h2>
+            <p>Install directly from GitHub for normal use.</p>
+            <pre><code>pip install "fps-uda @ git+https://github.com/baogegeJiang/FPS.git"</code></pre>
+            <p>Clone the repository when you want the packaged H5 fixture and examples.</p>
+            <pre><code>git clone https://github.com/baogegeJiang/FPS.git
+cd FPS
+pip install -e ".[dev]"</code></pre>
+          </article>
+          <article>
+            <h2>Run the smoke example</h2>
+            <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
+  --config configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml \
+  --iter-num 2 \
+  --out runs/examples/office31_aw_vit_smoke</code></pre>
+            <p>
+              After editable install, replace
+              <code>PYTHONPATH=src python -m fps_uda.cli</code> with
+              <code>fps-uda</code>.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Optional extras</p>
+          <h2>Install only the pieces you use</h2>
+          <div class="cards">
+            <article class="item">
+              <h3>Feature extraction</h3>
+              <pre><code>pip install -e ".[vision]"</code></pre>
+              <p>Installs image/backbone dependencies for extracting feature banks.</p>
+            </article>
+            <article class="item">
+              <h3>Hugging Face banks</h3>
+              <pre><code>pip install -e ".[hf]"</code></pre>
+              <p>Installs downloader support for released H5 feature banks.</p>
+            </article>
+            <article class="item">
+              <h3>Transformers backbones</h3>
+              <pre><code>pip install -e ".[transformers]"</code></pre>
+              <p>Installs support for HuggingFace ViT, CLIP, and AutoModel vision backbones.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Next steps</p>
+          <h2>Move from smoke test to a benchmark task</h2>
+          <div class="workflow">
+            <article>
+              <span class="step">1</span>
+              <h3>Download banks</h3>
+              <pre><code>PYTHONPATH=src python scripts/download_feature_banks.py all</code></pre>
+            </article>
+            <article>
+              <span class="step">2</span>
+              <h3>Analyze views</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank \
+  --feature-bank fps_h5cache/banks/office31_vit.h5 \
+  --source-domain amazon \
+  --target-domain webcam \
+  --out runs/analysis/office31_vit</code></pre>
+            </article>
+            <article>
+              <span class="step">3</span>
+              <h3>Train</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
+  --config configs/training/office31/amazon_to_webcam/vit.yaml \
+  --out runs/office31/amazon_to_webcam/vit</code></pre>
+            </article>
+            <article>
+              <span class="step">4</span>
+              <h3>Learn the workflow</h3>
+              <p>
+                Continue with <a href="feature-banks.html">Feature Banks</a>
+                and <a href="training.html">Training</a> for the full workflow.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

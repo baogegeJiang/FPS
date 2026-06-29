@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Training | FPS-UDA</title>
+    <meta
+      name="description"
+      content="Configure and run FPS-UDA training, sweeps, autosearch, and Python API workflows."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a class="active" href="training.html">Training</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Training</p>
+          <h1>Train, sweep, or search FPS configs from selected H5 views.</h1>
+          <p class="lead">
+            Training YAML is sectioned and explicit: choose the bank, domains,
+            role-specific views, optimizer, schedule, normalization, losses, and
+            evaluation settings.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">CLI</p>
+          <h2>Train or sweep</h2>
+          <div class="code-grid">
+            <article>
+              <h3>Train</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
+  --config configs/training/office31/amazon_to_webcam/vit.yaml \
+  --out runs/office31/amazon_to_webcam/vit</code></pre>
+            </article>
+            <article>
+              <h3>Sweep</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli sweep \
+  --config configs/training/office31/amazon_to_webcam/vit.yaml \
+  --alpha-grid 0.6,0.8,1.0 \
+  --beta-grid 0.4,0.6 \
+  --out runs/sweeps/office31_aw_vit</code></pre>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Configuration</p>
+          <h2>Sectioned YAML</h2>
+          <div class="cards">
+            <article class="item">
+              <h3><code>io</code> and <code>views</code></h3>
+              <p>
+                Select the H5 bank, source/target domains, feature transform,
+                and role-specific view keys. Multiple views can be
+                <code>stack</code>ed or <code>mean</code>-combined.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>optimization</code> and <code>schedule</code></h3>
+              <p>
+                Configure SGD or AdamW, <code>base_lr</code>, LR schedule,
+                update count, dynamic <code>alpha/beta</code>, and sample
+                ratios.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>losses</code></h3>
+              <p>
+                Enable LSE, LCE, LCR, LDelta, sparse density weights, and
+                pseudo-margin weights. <code>margin_start_step</code> makes the
+                margin warmup explicit.
+              </p>
+            </article>
+          </div>
+          <article class="wide-code">
+            <pre><code>io:
+  feature_bank: fps_h5cache/banks/office_home_vit.h5
+  source_domain: "Real World"
+  target_domain: Clipart
+  feature_transform: none
+  num_classes: 65
+
+views:
+  src: {key: pad_resize256_input224_center_orig_clean, combine: stack}
+  entropy: {key: pad_resize256_input224_center_orig_clean, combine: mean}
+  cr:
+    view1: {key: pad_resize256_input224_center_orig_pool_a, combine: stack}
+    view2: {key: pad_resize256_input224_center_orig_pool_b, combine: stack}
+  eval: {key: pad_resize256_input224_center_orig_clean, combine: mean}</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Autosearch</p>
+            <h2>Search reusable training configs</h2>
+            <p>
+              The search helper selects candidate views, evaluates LR candidates,
+              searches <code>alpha/beta</code>, <code>lambda_lcr</code>, and
+              margin settings, then writes sectioned YAML files.
+            </p>
+            <pre><code>PYTHONPATH=src BACKBONES="resnet vit siglip2" DEVICE=cuda:0 \
+  bash scripts/search_training_configs.sh</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Search outputs</h3>
+            <ul class="plain-list">
+              <li><code>configs/training_autosearch/.../{suffix}.yaml</code></li>
+              <li><code>search_summary.csv</code> and <code>search_summary.json</code></li>
+              <li><code>source_only</code> and oracle <code>target_only</code> reference rows</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Python API</p>
+          <h2>Train from NumPy, Torch, or selected H5 views</h2>
+          <article class="wide-code">
+            <pre><code>from fps_uda import FeatureSet, FPSConfig, train_fps
+
+features = FeatureSet(
+    src_features=src_x,
+    src_labels=src_y,
+    entropy_features=tgt_x_eval,
+    entropy_labels=tgt_y_eval,
+    cr_features_1=tgt_x_view1,
+    cr_features_2=tgt_x_view2,
+    cr_labels=tgt_y_eval,
+    eval_features=tgt_x_eval,
+    eval_labels=tgt_y_eval,
+)
+
+config = FPSConfig(
+    num_classes=31,
+    feature_dim=src_x.shape[1],
+    device="cuda:0",
+    base_lr=0.000375,
+    iter_num=3000,
+)
+
+result = train_fps(features, config, output_dir="runs/python_api")</code></pre>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

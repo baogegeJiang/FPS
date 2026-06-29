@@ -6,49 +6,44 @@
     <title>FPS-UDA Documentation</title>
     <meta
       name="description"
-      content="FPS-UDA: feature-space unsupervised domain adaptation with frozen feature banks, PyTorch training, and configurable CLI workflows."
+      content="FPS-UDA: feature-space unsupervised domain adaptation with reusable H5 feature banks, PyTorch training, and configurable CLI workflows."
     >
     <link rel="stylesheet" href="assets/site.css">
   </head>
   <body>
     <header class="site-header">
       <nav class="nav" aria-label="Primary">
-        <a class="brand" href="#top">FPS-UDA</a>
+        <a class="brand" href="index.html">FPS-UDA</a>
         <div class="nav-links">
-          <a href="#paper">Paper</a>
-          <a href="#quick-start">Quick Start</a>
-          <a href="#workflow">Workflow</a>
-          <a href="#config">Config</a>
-          <a href="#api">API</a>
-          <a href="#advanced">Advanced</a>
-          <a href="#citation">Citation</a>
+          <a class="active" href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
         </div>
       </nav>
     </header>
 
-    <main id="top">
+    <main>
       <section class="hero section-band">
         <div class="container hero-grid">
           <div>
             <p class="eyebrow">Feature-space domain adaptation</p>
             <h1>FPS-UDA trains decision planes over frozen feature banks.</h1>
             <p class="lead">
-              Build or download dataset-level H5 feature banks, select
+              Build or download dataset-level H5 feature banks, select explicit
               source/target views, and train Feature-Space Planes Searcher
               (FPS) from NumPy, Torch, or H5 features.
             </p>
             <div class="button-row" aria-label="Primary links">
-              <a class="button primary" href="#quick-start">Run the example</a>
-              <a class="button" href="https://github.com/baogegeJiang/FPS">GitHub</a>
+              <a class="button primary" href="quickstart.html">Run the example</a>
+              <a class="button" href="feature-banks.html">Use feature banks</a>
               <a class="button" href="https://ieeexplore.ieee.org/abstract/document/11568428">Paper</a>
             </div>
           </div>
           <aside class="status-panel" aria-label="Project facts">
-            <img
-              class="fps-logo"
-              src="assets/fps-logo.png"
-              alt="FPS logo"
-            >
+            <img class="fps-logo" src="assets/fps-logo.png" alt="FPS logo">
             <h2>Project</h2>
             <dl>
               <div>
@@ -64,15 +59,52 @@
                 <dd>MIT</dd>
               </div>
               <div>
-                <dt>Pages</dt>
-                <dd><code>baogegeJiang.github.io/FPS</code></dd>
+                <dt>Banks</dt>
+                <dd><code>baogege1995/FPS_H5</code></dd>
               </div>
             </dl>
           </aside>
         </div>
       </section>
 
-      <section id="paper" class="section">
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Documentation</p>
+          <h2>Choose the path you need</h2>
+          <div class="cards">
+            <a class="item link-card" href="quickstart.html">
+              <h3>Quick Start</h3>
+              <p>
+                Install FPS-UDA, run the packaged Office31 smoke test, and move
+                from editable install to the <code>fps-uda</code> CLI.
+              </p>
+            </a>
+            <a class="item link-card" href="feature-banks.html">
+              <h3>Feature Banks</h3>
+              <p>
+                Download released H5 banks, inspect view roles, analyze views,
+                and extract new banks from images.
+              </p>
+            </a>
+            <a class="item link-card" href="training.html">
+              <h3>Training</h3>
+              <p>
+                Configure <code>io</code>, <code>views</code>, optimization,
+                schedules, losses, train/sweep commands, and Python API usage.
+              </p>
+            </a>
+            <a class="item link-card" href="advanced.html">
+              <h3>Advanced</h3>
+              <p>
+                Add custom losses, use custom backbones, use HuggingFace
+                AutoModel vision encoders, and understand public release choices.
+              </p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="paper" class="section section-band">
         <div class="container two-column">
           <div>
             <p class="eyebrow">Paper</p>
@@ -96,314 +128,13 @@
             <ul class="plain-list">
               <li><a href="https://ieeexplore.ieee.org/abstract/document/11568428">IEEE Xplore document 11568428</a></li>
               <li><a href="https://github.com/baogegeJiang/FPS">GitHub repository</a></li>
-              <li><a href="https://github.com/baogegeJiang/FPS/blob/main/README.md">README</a></li>
+              <li><a href="https://huggingface.co/datasets/baogege1995/FPS_H5">Released feature banks</a></li>
             </ul>
           </aside>
         </div>
       </section>
 
-      <section id="quick-start" class="section">
-        <div class="container">
-          <p class="eyebrow">Quick Start</p>
-          <h2>Run a real-H5 task bundled with the repository</h2>
-          <p>
-            The repository includes a compressed Office31
-            <code>amazon -> webcam</code> ViT feature bank. It keeps all source
-            and target samples for that task and only the views needed by the
-            example config.
-          </p>
-          <div class="code-grid">
-            <article>
-              <h3>Install from GitHub</h3>
-              <pre><code>pip install "fps-uda @ git+https://github.com/baogegeJiang/FPS.git"</code></pre>
-              <p>
-                Clone the repository instead when you want the packaged H5
-                example file and editable development mode. Add extras only for
-                the workflows you use.
-              </p>
-              <pre><code>git clone https://github.com/baogegeJiang/FPS.git
-cd FPS
-pip install -e ".[dev]"
-
-# optional: image feature extraction
-pip install -e ".[vision]"
-
-# optional: released bank download
-pip install -e ".[hf]"</code></pre>
-            </article>
-            <article>
-              <h3>Smoke run</h3>
-              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
-  --config configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml \
-  --iter-num 2 \
-  --out runs/examples/office31_aw_vit_smoke</code></pre>
-              <p>
-                After editable install, replace
-                <code>PYTHONPATH=src python -m fps_uda.cli</code> with
-                <code>fps-uda</code>.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="workflow" class="section">
-        <div class="container">
-          <p class="eyebrow">CLI Workflow</p>
-          <h2>Feature bank -> analysis -> search -> training</h2>
-          <div class="workflow">
-            <article>
-              <span class="step">1</span>
-              <h3>Download banks</h3>
-              <pre><code>PYTHONPATH=src python scripts/download_feature_banks.py all</code></pre>
-              <p>
-                Downloads released H5 banks from the Hugging Face dataset repo.
-                The default endpoint mode automatically falls back to
-                <code>https://hf-mirror.com</code>; use
-                <code>--endpoint hf-mirror</code> to force the mirror.
-                If mirror metadata lookup fails, the script retries with direct
-                <code>/resolve/...</code> URLs.
-              </p>
-            </article>
-            <article>
-              <span class="step">2</span>
-              <h3>Extract features</h3>
-              <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
-  --dataset-config configs/datasets/office31_vit.yaml \
-  --out fps_h5cache/banks/office31_vit.h5 \
-  --device cuda:0</code></pre>
-              <p>Dataset YAML declares domains, transforms, backbone, and views.</p>
-            </article>
-            <article>
-              <span class="step">3</span>
-              <h3>Analyze views</h3>
-              <pre><code>PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank \
-  --feature-bank fps_h5cache/banks/office31_vit.h5 \
-  --source-domain amazon \
-  --target-domain webcam \
-  --out runs/analysis/office31_vit</code></pre>
-              <p>Analysis uses labels for debugging and does not modify the bank.</p>
-            </article>
-            <article>
-              <span class="step">4</span>
-              <h3>Search configs</h3>
-              <pre><code>PYTHONPATH=src BACKBONES="resnet vit siglip2" DEVICE=cuda:0 \
-  bash scripts/search_training_configs.sh</code></pre>
-              <p>
-                Autosearched YAML files are written to
-                <code>configs/training_autosearch/.../{suffix}.yaml</code>.
-                Each search summary starts with <code>source_only</code> and
-                <code>target_only</code> supervised baselines using
-                <code>beta=1</code> and <code>beta_0=1</code>. The
-                <code>target_only</code> row is an oracle reference and does not
-                participate in best-config selection.
-              </p>
-            </article>
-            <article>
-              <span class="step">5</span>
-              <h3>Train or sweep</h3>
-              <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
-  --config configs/training/office31/amazon_to_webcam/vit.yaml \
-  --out runs/office31/amazon_to_webcam/vit
-
-PYTHONPATH=src python -m fps_uda.cli sweep \
-  --config configs/training/office31/amazon_to_webcam/vit.yaml \
-  --alpha-grid 0.6,0.8,1.0 \
-  --beta-grid 0.4,0.6 \
-  --out runs/sweeps/office31_aw_vit</code></pre>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="concepts" class="section section-band">
-        <div class="container">
-          <p class="eyebrow">Core Concepts</p>
-          <h2>Dataset-level H5 banks and explicit view roles</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Role</th>
-                  <th>Meaning</th>
-                  <th>Typical view</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>src</code></td>
-                  <td>Source supervised features and labels.</td>
-                  <td><code>*_clean</code></td>
-                </tr>
-                <tr>
-                  <td><code>entropy</code></td>
-                  <td>Target view for LSE/LCE entropy losses.</td>
-                  <td><code>*_clean</code></td>
-                </tr>
-                <tr>
-                  <td><code>cr.view1</code>, <code>cr.view2</code></td>
-                  <td>Paired target views for LCR consistency.</td>
-                  <td><code>*_pool_a</code>, <code>*_pool_b</code></td>
-                </tr>
-                <tr>
-                  <td><code>eval</code></td>
-                  <td>Target view for metrics and predictions.</td>
-                  <td><code>*_clean</code></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <pre><code>/domains/{domain}/label
-/domains/{domain}/views/{view_key}/feature</code></pre>
-        </div>
-      </section>
-
-      <section id="config" class="section">
-        <div class="container">
-          <p class="eyebrow">Configuration</p>
-          <h2>Training and extraction configs are explicit</h2>
-          <div class="cards">
-            <article class="item">
-              <h3><code>io</code> and <code>views</code></h3>
-              <p>
-                Select the H5 bank, source/target domains, feature transform,
-                and role-specific view keys. Multiple views can be
-                <code>stack</code>ed or <code>mean</code>-combined.
-              </p>
-            </article>
-            <article class="item">
-              <h3><code>optimization</code> and <code>schedule</code></h3>
-              <p>
-                Configure SGD or AdamW, <code>base_lr</code>, LR schedule,
-                update count, dynamic <code>alpha/beta</code>, and sample
-                ratios.
-              </p>
-            </article>
-            <article class="item">
-              <h3><code>losses</code></h3>
-              <p>
-                Enable LSE, LCE, LCR, LDelta, sparse density weights, and
-                pseudo-margin weights. <code>margin_start_step</code> makes the
-                margin warmup explicit.
-              </p>
-            </article>
-            <article class="item">
-              <h3>Extraction YAML</h3>
-              <p>
-                Declares domain manifests, image normalization, deterministic
-                view geometry, backbone backend, and pooling strategy.
-                Per-view <code>random_pooling_count</code> controls how many
-                <code>pool_a</code>, <code>pool_b</code>, ... views are written;
-                it defaults to <code>2</code>.
-              </p>
-            </article>
-            <article class="item">
-              <h3>Backbone defaults</h3>
-              <p>
-                ResNet presets use torchvision weights and spatial shared
-                random pooling. ViT presets use timm and token-channel squared
-                random pooling. HuggingFace AutoModel vision backbones can be
-                selected with <code>hf_auto_vision</code>; this is the backend
-                used by the SigLIP 2 presets.
-              </p>
-            </article>
-            <article class="item">
-              <h3>SigLIP 2 AutoModel</h3>
-              <p>
-                Presets such as <code>configs/datasets/office_home_siglip2.yaml</code>
-                use <code>google/siglip2-so400m-patch14-384</code> through
-                HuggingFace <code>AutoModel</code>.
-              </p>
-              <pre><code>backbone:
-  backend: hf_auto_vision
-  name: google/siglip2-so400m-patch14-384
-  in_features: 1152
-  pooling:
-    feature_type: token
-    random_strategy: token_channel_squared</code></pre>
-              <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
-  --dataset-config configs/datasets/office_home_siglip2.yaml \
-  --out fps_h5cache/banks/office_home_siglip2.h5 \
-  --device cuda:0</code></pre>
-            </article>
-            <article class="item">
-              <h3>Packaged example</h3>
-              <p>
-                <code>configs/examples/office31_amazon_to_webcam_vit_packaged_h5.yaml</code>
-                runs directly on the bundled H5 fixture.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="api" class="section section-band">
-        <div class="container">
-          <p class="eyebrow">Python API</p>
-          <h2>Train from NumPy, Torch, or selected H5 views</h2>
-          <article class="wide-code">
-            <pre><code>from fps_uda import FeatureSet, FPSConfig, train_fps
-
-features = FeatureSet(
-    src_features=src_x,
-    src_labels=src_y,
-    entropy_features=tgt_x_eval,
-    entropy_labels=tgt_y_eval,
-    cr_features_1=tgt_x_view1,
-    cr_features_2=tgt_x_view2,
-    cr_labels=tgt_y_eval,
-    eval_features=tgt_x_eval,
-    eval_labels=tgt_y_eval,
-)
-
-config = FPSConfig(
-    num_classes=31,
-    feature_dim=src_x.shape[1],
-    device="cuda:0",
-    base_lr=0.000375,
-    iter_num=3000,
-)
-
-result = train_fps(features, config, output_dir="runs/python_api")</code></pre>
-          </article>
-        </div>
-      </section>
-
-      <section id="advanced" class="section">
-        <div class="container two-column">
-          <div>
-            <p class="eyebrow">Advanced</p>
-            <h2>Customize losses and backbones in Python</h2>
-            <p>
-              Custom losses receive a dict-like context with
-              <code>batch</code>, <code>outputs</code>, <code>weights</code>,
-              <code>schedules</code>, <code>step</code>, and mutable
-              <code>state</code>. Use <code>extra_loss_terms</code> to append a
-              loss, or <code>loss_terms</code> to replace the default list.
-            </p>
-            <pre><code>from fps_uda import LossOutput
-
-def extra_entropy_logit_penalty(ctx):
-    logits = ctx["outputs"]["entropy.logits"]
-    value = logits.sum() * 0.0 if ctx["step"] < 100 else 0.01 * logits.pow(2).mean()
-    return LossOutput("extra_entropy_logit_penalty", value)</code></pre>
-          </div>
-          <aside class="item">
-            <h3>Runnable examples</h3>
-            <ul class="plain-list">
-              <li><code>examples/custom_loss_training.py</code></li>
-              <li><code>examples/advanced_custom_backbone_feature_bank.py</code></li>
-            </ul>
-            <p>
-              A custom backbone may return flat features, spatial maps, or token
-              features; <code>PoolableBackbone</code> handles FPS-UDA pooling
-              views.
-            </p>
-          </aside>
-        </div>
-      </section>
-
-      <section id="citation" class="section section-band">
+      <section class="section">
         <div class="container two-column">
           <div>
             <p class="eyebrow">Citation</p>
@@ -426,22 +157,6 @@ def extra_entropy_logit_penalty(ctx):
               <li><a href="https://github.com/ZhongH-Qin">ZhongH-Qin</a></li>
             </ul>
           </aside>
-        </div>
-      </section>
-
-      <section id="pages" class="section">
-        <div class="container">
-          <p class="eyebrow">Publishing</p>
-          <h2>GitHub Pages setup</h2>
-          <p>
-            This site has no build step. In repository settings, publish from
-            the <code>main</code> branch and the <code>/docs</code> folder.
-          </p>
-          <pre><code>Settings -> Pages -> Deploy from a branch -> main / docs</code></pre>
-          <p>
-            Public URL:
-            <a href="https://baogegeJiang.github.io/FPS/">https://baogegeJiang.github.io/FPS/</a>
-          </p>
         </div>
       </section>
     </main>

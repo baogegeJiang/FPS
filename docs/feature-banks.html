@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Feature Banks | FPS-UDA</title>
+    <meta
+      name="description"
+      content="Download, inspect, analyze, and extract FPS-UDA dataset-level H5 feature banks."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a class="active" href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Feature Banks</p>
+          <h1>Dataset-level H5 banks store domains and deterministic views.</h1>
+          <p class="lead">
+            A single bank can support many source-target tasks. Training chooses
+            source, entropy, consistency, and evaluation views by key.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container two-column">
+          <div>
+            <h2>Download released banks</h2>
+            <p>
+              Released H5 banks are hosted in the Hugging Face dataset repo
+              <a href="https://huggingface.co/datasets/baogege1995/FPS_H5">baogege1995/FPS_H5</a>.
+              The downloader tries <code>$HF_ENDPOINT</code>, Hugging Face, and
+              then <code>https://hf-mirror.com</code>.
+            </p>
+            <pre><code>PYTHONPATH=src python scripts/download_feature_banks.py all
+
+PYTHONPATH=src python scripts/download_feature_banks.py \
+  office31_resnet office_home_vit
+
+PYTHONPATH=src python scripts/download_feature_banks.py all \
+  --endpoint hf-mirror</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Released bank keys</h3>
+            <ul class="plain-list">
+              <li><code>office31_resnet</code>, <code>office31_vit</code>, <code>office31_siglip2</code></li>
+              <li><code>office_home_resnet</code>, <code>office_home_vit</code>, <code>office_home_siglip2</code></li>
+              <li><code>visda17_resnet</code>, <code>visda17_vit</code>, <code>visda17_siglip2</code></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Schema</p>
+          <h2>H5 layout and view roles</h2>
+          <pre><code>/domains/{domain}/label
+/domains/{domain}/views/{view_key}/feature</code></pre>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Meaning</th>
+                  <th>Typical view</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>src</code></td>
+                  <td>Source supervised features and labels.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+                <tr>
+                  <td><code>entropy</code></td>
+                  <td>Target view for LSE/LCE entropy losses.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+                <tr>
+                  <td><code>cr.view1</code>, <code>cr.view2</code></td>
+                  <td>Paired target views for LCR consistency.</td>
+                  <td><code>*_pool_a</code>, <code>*_pool_b</code></td>
+                </tr>
+                <tr>
+                  <td><code>eval</code></td>
+                  <td>Target view for metrics and predictions.</td>
+                  <td><code>*_clean</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Workflow</p>
+          <h2>Extract and analyze banks</h2>
+          <div class="code-grid">
+            <article>
+              <h3>Extract a bank</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
+  --dataset-config configs/datasets/office31_vit.yaml \
+  --out fps_h5cache/banks/office31_vit.h5 \
+  --device cuda:0</code></pre>
+              <p>
+                Dataset YAML declares domains, manifests, transforms, backbone,
+                pooling strategy, and deterministic views.
+              </p>
+            </article>
+            <article>
+              <h3>Analyze views</h3>
+              <pre><code>PYTHONPATH=src python -m fps_uda.cli analyze-feature-bank \
+  --feature-bank fps_h5cache/banks/office31_vit.h5 \
+  --source-domain amazon \
+  --target-domain webcam \
+  --out runs/analysis/office31_vit</code></pre>
+              <p>
+                Analysis uses labels for debugging and selection. It writes
+                CSV/JSON/YAML summaries and does not modify the H5 bank.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Large vision models</p>
+            <h2>SigLIP 2 through HuggingFace AutoModel</h2>
+            <p>
+              Presets such as <code>configs/datasets/office_home_siglip2.yaml</code>
+              use <code>google/siglip2-so400m-patch14-384</code> through
+              HuggingFace <code>AutoModel</code>.
+            </p>
+            <pre><code>backbone:
+  backend: hf_auto_vision
+  name: google/siglip2-so400m-patch14-384
+  in_features: 1152
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Generate a SigLIP 2 bank</h3>
+            <pre><code>PYTHONPATH=src python -m fps_uda.cli extract-feature-bank \
+  --dataset-config configs/datasets/office_home_siglip2.yaml \
+  --out fps_h5cache/banks/office_home_siglip2.h5 \
+  --device cuda:0</code></pre>
+            <p>
+              SigLIP 2 presets use 384-sized deterministic views and retain
+              random pooling views.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

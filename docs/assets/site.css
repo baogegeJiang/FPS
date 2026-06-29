@@ -119,6 +119,11 @@ pre code {
   text-decoration: none;
 }
 
+.nav-links a.active {
+  color: var(--accent-strong);
+  background: #e7f1f0;
+}
+
 .section,
 .section-band {
   padding: 78px 0;
@@ -137,6 +142,15 @@ pre code {
 
 .hero {
   padding-top: 82px;
+}
+
+.page-hero {
+  padding-top: 70px;
+  padding-bottom: 72px;
+}
+
+.page-hero h1 {
+  max-width: 980px;
 }
 
 .hero-grid,
@@ -237,6 +251,27 @@ p {
   transform: translateY(-1px);
   box-shadow: var(--shadow);
   text-decoration: none;
+}
+
+.link-card {
+  display: block;
+  color: inherit;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.link-card:hover {
+  transform: translateY(-2px);
+  border-color: #aec8c5;
+  box-shadow: var(--shadow);
+  text-decoration: none;
+}
+
+.link-card h3::after {
+  content: " ->";
+  color: var(--accent);
 }
 
 .status-panel,

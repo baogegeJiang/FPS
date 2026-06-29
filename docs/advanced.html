@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Advanced | FPS-UDA</title>
+    <meta
+      name="description"
+      content="Customize FPS-UDA losses, backbones, AutoModel vision encoders, and understand public release choices."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a class="active" href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Advanced</p>
+          <h1>Customize losses, backbones, and large vision models in Python.</h1>
+          <p class="lead">
+            The CLI covers built-in FPS workflows. For research extensions,
+            use the Python API to inject losses, wrap custom encoders, or build
+            feature banks from compatible model outputs.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container two-column">
+          <div>
+            <h2>Custom losses</h2>
+            <p>
+              Custom losses receive a dict-like context with
+              <code>batch</code>, <code>outputs</code>, <code>weights</code>,
+              <code>schedules</code>, <code>step</code>, and mutable
+              <code>state</code>. Use <code>extra_loss_terms</code> to append a
+              loss, or <code>loss_terms</code> to replace the default list.
+            </p>
+            <pre><code>from fps_uda import LossOutput
+
+def extra_entropy_logit_penalty(ctx):
+    logits = ctx["outputs"]["entropy.logits"]
+    value = logits.sum() * 0.0 if ctx["step"] < 100 else 0.01 * logits.pow(2).mean()
+    return LossOutput("extra_entropy_logit_penalty", value)</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Runnable examples</h3>
+            <ul class="plain-list">
+              <li><code>examples/custom_loss_training.py</code></li>
+              <li><code>examples/advanced_custom_backbone_feature_bank.py</code></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Backbones</p>
+            <h2>PoolableBackbone handles flat, spatial, or token features</h2>
+            <p>
+              A custom backbone may return flat features, spatial maps, or token
+              features. <code>PoolableBackbone</code> handles FPS-UDA clean and
+              random-pooling views.
+            </p>
+            <pre><code>backbone:
+  backend: hf_auto_vision
+  name: google/siglip2-so400m-patch14-384
+  pretrained: true
+  pooling:
+    feature_type: token
+    random_strategy: token_channel_squared</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Default pooling differences</h3>
+            <p>
+              ResNet presets use spatial shared random pooling. ViT, CLIP, and
+              SigLIP-style token models use token-channel squared random
+              pooling. The difference is explicit in YAML and preserved for
+              reproducibility.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Release choices</p>
+          <h2>Public feature-bank release</h2>
+          <div class="cards">
+            <article class="item">
+              <h3>Deterministic image views</h3>
+              <p>
+                The public feature-bank extraction simplifies random crop and
+                contrast perturbations into deterministic views such as
+                five-crop variants.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Random pooling retained</h3>
+              <p>
+                Random pooling remains part of the released view grid, so
+                consistency training can still use paired stochastic feature
+                views.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Configs re-searched</h3>
+              <p>
+                Because released banks differ slightly from the original
+                experimental pipeline, benchmark hyperparameters were
+                re-searched for the public configs.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Publishing</p>
+            <h2>GitHub Pages setup</h2>
+            <p>
+              This documentation site has no build step. In repository settings,
+              publish from the <code>main</code> branch and the
+              <code>/docs</code> folder.
+            </p>
+            <pre><code>Settings -> Pages -> Deploy from a branch -> main / docs</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Collaboration</h3>
+            <p>
+              We welcome collaborations from researchers and practitioners who
+              want to apply FPS-UDA to other domains or build new feature-bank
+              workflows around this method.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
