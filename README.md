@@ -1,4 +1,30 @@
-# FPS-UDA
+<p align="center">
+  <img src="docs/assets/fps-logo.png" alt="FPS-UDA logo" width="420">
+</p>
+
+<h1 align="center">FPS-UDA</h1>
+
+<p align="center">
+  Feature-space unsupervised domain adaptation from reusable H5 feature banks.
+</p>
+
+<p align="center">
+  <a href="https://ieeexplore.ieee.org/abstract/document/11568428">Paper</a>
+  ·
+  <a href="https://baogegeJiang.github.io/FPS/">Documentation</a>
+  ·
+  <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+  ·
+  <a href="https://huggingface.co/datasets/baogege1995/FPS_H5">Feature Banks</a>
+</p>
+
+<p align="center">
+  <img alt="Python >=3.9" src="https://img.shields.io/badge/python-%3E%3D3.9-blue">
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
+  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-feature--space%20training-ee4c2c">
+</p>
+
+## Overview
 
 FPS-UDA is a PyTorch library for feature-space unsupervised domain adaptation.
 It separates image feature extraction from feature-space training:
@@ -8,13 +34,6 @@ It separates image feature extraction from feature-space training:
 3. Train FPS from NumPy/Torch/H5 features.
 
 The package name is `fps-uda`; the import name is `fps_uda`.
-
-- GitHub: [baogegeJiang/FPS](https://github.com/baogegeJiang/FPS)
-- Documentation: [baogegeJiang.github.io/FPS](https://baogegeJiang.github.io/FPS/)
-
-<p align="center">
-  <img src="docs/assets/fps-logo.png" alt="FPS logo" width="520">
-</p>
 
 ## Paper
 
