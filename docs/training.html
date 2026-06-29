@@ -19,6 +19,7 @@
           <a href="quickstart.html">Quick Start</a>
           <a href="feature-banks.html">Feature Banks</a>
           <a class="active" href="training.html">Training</a>
+          <a href="reference.html">Reference</a>
           <a href="advanced.html">Advanced</a>
           <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
         </div>
@@ -62,6 +63,33 @@
       </section>
 
       <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Direct CLI</p>
+          <h2>Train without a config</h2>
+          <p>
+            For quick experiments, specify the feature bank, domains, and view
+            roles directly from the command line.
+          </p>
+          <article class="wide-code">
+            <pre><code>PYTHONPATH=src python -m fps_uda.cli train \
+  --feature-bank fps_h5cache/banks/office31_vit.h5 \
+  --source-domain amazon \
+  --target-domain webcam \
+  --src-view pad_resize256_input224_center_orig_clean \
+  --entropy-view pad_resize256_input224_center_orig_clean \
+  --cr-view1 pad_resize256_input224_center_orig_pool_a \
+  --cr-view2 pad_resize256_input224_center_orig_pool_b \
+  --eval-view pad_resize256_input224_center_orig_clean \
+  --feature-transform none \
+  --device cuda:0 \
+  --base-lr 0.000375 \
+  --iter-num 1000 \
+  --out runs/debug/cli_only</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
         <div class="container">
           <p class="eyebrow">Configuration</p>
           <h2>Sectioned YAML</h2>
@@ -110,7 +138,7 @@ views:
         </div>
       </section>
 
-      <section class="section">
+      <section class="section section-band">
         <div class="container two-column">
           <div>
             <p class="eyebrow">Autosearch</p>
@@ -134,7 +162,7 @@ views:
         </div>
       </section>
 
-      <section class="section section-band">
+      <section class="section">
         <div class="container">
           <p class="eyebrow">Python API</p>
           <h2>Train from NumPy, Torch, or selected H5 views</h2>

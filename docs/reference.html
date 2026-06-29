@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reference | FPS-UDA</title>
+    <meta
+      name="description"
+      content="FPS-UDA reference for YAML fields, CLI commands, dataset helpers, benchmark scripts, and repository layout."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a class="active" href="reference.html">Reference</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Reference</p>
+          <h1>YAML fields, CLI commands, utilities, and repository layout.</h1>
+          <p class="lead">
+            This page keeps the detailed tables out of the README while
+            preserving the implementation-oriented information needed for
+            feature-bank extraction and training.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">CLI command map</p>
+          <h2>Main commands and helper scripts</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Command</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>fps-uda extract-feature-bank</code></td>
+                  <td>Extract dataset-level H5 banks from image datasets.</td>
+                </tr>
+                <tr>
+                  <td><code>fps-uda analyze-feature-bank</code></td>
+                  <td>Compute analysis-only supervised view metrics and recommendations.</td>
+                </tr>
+                <tr>
+                  <td><code>fps-uda train</code></td>
+                  <td>Train FPS from feature-bank roles or NumPy/Torch feature arrays.</td>
+                </tr>
+                <tr>
+                  <td><code>fps-uda sweep</code></td>
+                  <td>Run alpha/beta sweeps from a sectioned training config.</td>
+                </tr>
+                <tr>
+                  <td><code>scripts/download_feature_banks.py</code></td>
+                  <td>Download released H5 banks from Hugging Face with mirror fallback.</td>
+                </tr>
+                <tr>
+                  <td><code>scripts/download_datasets.py</code></td>
+                  <td>Download datasets or generate manifests for existing local copies.</td>
+                </tr>
+                <tr>
+                  <td><code>scripts/search_fps_hyperparams.py</code></td>
+                  <td>Search views and key hyperparameters, then write runnable YAML.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <p class="eyebrow">Training YAML</p>
+          <h2>Training Parameter Reference</h2>
+          <div class="cards">
+            <article class="item">
+              <h3><code>io</code></h3>
+              <p>
+                <code>feature_bank</code>, <code>source_domain</code>,
+                <code>target_domain</code>, <code>feature_transform</code>,
+                <code>num_classes</code>, and <code>device</code>.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>views</code></h3>
+              <p>
+                <code>src</code>, <code>entropy</code>,
+                <code>cr.view1</code>, <code>cr.view2</code>, and
+                <code>eval</code>. Each role has a <code>key</code> and
+                <code>combine: stack|mean</code>.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>optimization</code></h3>
+              <p>
+                <code>optimizer</code>, <code>base_lr</code>,
+                <code>momentum</code>, <code>nesterov</code>,
+                <code>weight_decay</code>, <code>adamw_betas</code>,
+                <code>adamw_eps</code>, <code>lr_schedule</code>, and
+                <code>min_lr</code>.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>schedule</code></h3>
+              <p>
+                <code>iter_num</code>, <code>alpha</code>,
+                <code>alpha_0</code>, <code>beta</code>,
+                <code>beta_0</code>, <code>schedule_tau</code>,
+                <code>dynamic_parameters</code>, <code>src_sample_ratio</code>,
+                and <code>target_sample_ratio</code>.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>normalization</code></h3>
+              <p>
+                <code>normalize</code>, <code>cross_norm_scale</code>,
+                <code>cross_norm_target_weight</code>,
+                <code>self_norm_scale_src</code>, and
+                <code>self_norm_scale_tgt</code>.
+              </p>
+            </article>
+            <article class="item">
+              <h3><code>losses</code> and <code>eval</code></h3>
+              <p>
+                LSE/LCE/LCR, <code>lambda_lcr</code>,
+                <code>lcr_loss</code>, <code>lcr_sample_weight</code>,
+                sparse density, pseudo-margin, LDelta, entropy type,
+                <code>eval_interval</code>, <code>multi_class</code>, and
+                progress output.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Dataset YAML</p>
+          <h2>Extraction Parameter Reference</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Section</th>
+                  <th>Field</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>root</td>
+                  <td><code>root_dir</code></td>
+                  <td>Dataset root used by domain paths.</td>
+                </tr>
+                <tr>
+                  <td><code>backbone</code></td>
+                  <td><code>backend</code>, <code>name</code>, <code>weights</code>, <code>checkpoint</code></td>
+                  <td>Model source and optional weights/checkpoint.</td>
+                </tr>
+                <tr>
+                  <td><code>backbone.pooling</code></td>
+                  <td><code>feature_type</code>, <code>random_strategy</code></td>
+                  <td>Pooling shape and random mask strategy.</td>
+                </tr>
+                <tr>
+                  <td><code>loader</code></td>
+                  <td><code>batch_size</code>, <code>num_workers</code></td>
+                  <td>DataLoader settings.</td>
+                </tr>
+                <tr>
+                  <td><code>transform</code></td>
+                  <td><code>mean</code>, <code>std</code>, <code>interpolation</code>, <code>antialias</code>, <code>pad_fill</code></td>
+                  <td>Deterministic preprocessing controls.</td>
+                </tr>
+                <tr>
+                  <td><code>domains</code></td>
+                  <td><code>kind: manifest</code> or <code>kind: class_folder</code></td>
+                  <td>Read image paths and labels from manifests or folders.</td>
+                </tr>
+                <tr>
+                  <td><code>feature_bank</code></td>
+                  <td><code>water_level</code>, <code>mute_padding_in_pool</code></td>
+                  <td>Random pooling water level and padding-mask behavior.</td>
+                </tr>
+                <tr>
+                  <td><code>feature_bank.views</code></td>
+                  <td><code>pad_to_square</code>, <code>resize_size</code>, <code>input_size</code>, <code>crop</code>, <code>flip</code></td>
+                  <td>Deterministic view geometry.</td>
+                </tr>
+                <tr>
+                  <td><code>feature_bank.views</code></td>
+                  <td><code>random_pooling_count</code></td>
+                  <td>Optional number of random pooling views per base view; defaults to <code>2</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            With <code>random_pooling_count: 2</code>, a base key such as
+            <code>pad_resize256_input224_center_orig</code> expands to
+            <code>*_clean</code>, <code>*_pool_a</code>, and
+            <code>*_pool_b</code>. Set it to <code>0</code> for clean-only
+            banks, or larger values for <code>pool_c</code>, <code>pool_d</code>,
+            and so on.
+          </p>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Benchmark utilities</p>
+            <h2>Run benchmark configs</h2>
+            <pre><code>PYTHONPATH=src \
+PYTHON_BIN=python \
+DEVICE=cuda:0 \
+RESUME=1 \
+KEEP_GOING=1 \
+bash scripts/run_benchmarks.sh</code></pre>
+            <pre><code>PYTHONPATH=src DATASETS=office31 BACKBONES=vit DRY_RUN=1 \
+  bash scripts/run_benchmarks.sh
+
+PYTHONPATH=src TASKS=amazon_to_webcam ITER_NUM=1000 \
+  bash scripts/run_benchmarks.sh</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Repository layout</h3>
+            <pre><code>src/fps_uda/          Python package
+configs/datasets/    feature-bank extraction configs
+configs/training/    benchmark training configs
+configs/examples/    small runnable examples
+examples/            Python customization examples
+scripts/             dataset, bank, benchmark helpers
+tests/fixtures/      packaged real-H5 fixture</code></pre>
+            <p>
+              Historical experiment folders are archived under
+              <code>bak/</code> and are not public entry points.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

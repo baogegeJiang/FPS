@@ -19,6 +19,7 @@
           <a href="quickstart.html">Quick Start</a>
           <a class="active" href="feature-banks.html">Feature Banks</a>
           <a href="training.html">Training</a>
+          <a href="reference.html">Reference</a>
           <a href="advanced.html">Advanced</a>
           <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
         </div>
@@ -141,6 +142,37 @@ PYTHONPATH=src python scripts/download_feature_banks.py all \
       </section>
 
       <section class="section section-band">
+        <div class="container two-column">
+          <div>
+            <p class="eyebrow">Image datasets</p>
+            <h2>Download datasets and generate manifests</h2>
+            <p>
+              The helper can download Office31, OfficeHome, and VisDA17, or
+              generate manifests for existing local copies with
+              <code>--skip-download</code>.
+            </p>
+            <pre><code>PYTHONPATH=src python scripts/download_datasets.py office31 --root data
+PYTHONPATH=src python scripts/download_datasets.py office_home --root data
+PYTHONPATH=src python scripts/download_datasets.py visda17 --root data
+
+PYTHONPATH=src python scripts/download_datasets.py all --root data --skip-download</code></pre>
+          </div>
+          <aside class="item">
+            <h3>Generated manifests</h3>
+            <ul class="plain-list">
+              <li><code>data/office31/{amazon,dslr,webcam}/annotations/annotations.txt</code></li>
+              <li><code>data/office_home/{Art,Clipart,Product,Real World}/annotations/annotations.txt</code></li>
+              <li><code>data/visda17/{train,validation}/image_list.txt</code></li>
+            </ul>
+            <p>
+              Download URLs can be overridden with dataset-specific
+              <code>--*-url</code> flags.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
         <div class="container two-column">
           <div>
             <p class="eyebrow">Large vision models</p>
