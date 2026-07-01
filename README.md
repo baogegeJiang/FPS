@@ -37,15 +37,17 @@ The package name is `fps-uda`; the import name is `fps_uda`.
 
 ## Documentation
 
-The full documentation is split into short GitHub Pages:
+The full documentation is split into short pages. Open the local HTML files
+directly from this repository, or use the rendered GitHub Pages site.
 
-| Page | Contents |
-| --- | --- |
-| [Quick Start](https://baogegeJiang.github.io/FPS/quickstart.html) | install, packaged H5 smoke run |
-| [Feature Banks](https://baogegeJiang.github.io/FPS/feature-banks.html) | download, dataset manifests, H5 schema, extraction, analysis, SigLIP2 banks |
-| [Training](https://baogegeJiang.github.io/FPS/training.html) | train, sweep, direct CLI view roles, autosearch, Python API |
-| [Reference](https://baogegeJiang.github.io/FPS/reference.html) | YAML fields, CLI map, benchmark utilities, repo layout |
-| [Advanced](https://baogegeJiang.github.io/FPS/advanced.html) | custom losses, custom backbones, AutoModel vision encoders |
+| Page | Local HTML | Web page | Contents |
+| --- | --- | --- | --- |
+| Quick Start | [docs/quickstart.html](docs/quickstart.html) | [Pages](https://baogegeJiang.github.io/FPS/quickstart.html) | install, packaged H5 smoke run |
+| Feature Banks | [docs/feature-banks.html](docs/feature-banks.html) | [Pages](https://baogegeJiang.github.io/FPS/feature-banks.html) | download, dataset manifests, H5 schema, extraction, analysis, SigLIP2 banks |
+| Training | [docs/training.html](docs/training.html) | [Pages](https://baogegeJiang.github.io/FPS/training.html) | train, sweep, direct CLI view roles, autosearch, Python API |
+| Reference | [docs/reference.html](docs/reference.html) | [Pages](https://baogegeJiang.github.io/FPS/reference.html) | YAML fields, CLI map, benchmark utilities, repo layout |
+| Story | [docs/story.html](docs/story.html) | [Pages](https://baogegeJiang.github.io/FPS/story.html) | origin narrative, historical prototype H5, original notebooks |
+| Advanced | [docs/advanced.html](docs/advanced.html) | [Pages](https://baogegeJiang.github.io/FPS/advanced.html) | custom losses, custom backbones, AutoModel vision encoders |
 
 ## Install
 

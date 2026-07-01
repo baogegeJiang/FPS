@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Story | FPS-UDA</title>
+    <meta
+      name="description"
+      content="The origin story of FPS-UDA and the historical feature-space prototype artifact."
+    >
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">FPS-UDA</a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="quickstart.html">Quick Start</a>
+          <a href="feature-banks.html">Feature Banks</a>
+          <a href="training.html">Training</a>
+          <a href="reference.html">Reference</a>
+          <a class="active" href="story.html">Story</a>
+          <a href="advanced.html">Advanced</a>
+          <a href="https://github.com/baogegeJiang/FPS">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero section-band">
+        <div class="container">
+          <p class="eyebrow">Origin story</p>
+          <h1>From tuning encoders to searching feature-space planes.</h1>
+          <p class="lead">
+            FPS-UDA began as a small question about whether a frozen encoder's
+            feature space already contained enough structure, and whether the
+            harder problem was placing a better decision plane on top of it.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container two-column">
+          <div>
+            <h2>The initial turn</h2>
+            <p>
+              Before this prototype, our experiments mostly followed the usual
+              route of adapting the image encoder itself. We tried objectives
+              related to contrastive and consistency-style learning, aiming to
+              make source and target feature distributions more compatible.
+            </p>
+            <p>
+              During early exploration, we asked a simpler question: if a
+              pretrained encoder is frozen, can the existing feature space still
+              support a better target decision boundary? The earliest test saved
+              ResNet 2048-dimensional features into a small H5 file and trained
+              only a lightweight linear <code>DY</code> decision module over
+              those fixed features.
+            </p>
+            <p>
+              That prototype was not a polished benchmark. It was a direct
+              feature-space experiment, kept here because it records the first
+              concrete version of the idea.
+            </p>
+          </div>
+          <aside class="item">
+            <h3>Historical artifact</h3>
+            <ul class="plain-list">
+              <li><a href="../examples/origin_story/feature.h5"><code>feature.h5</code></a></li>
+              <li><a href="../examples/origin_story/test2.ipynb"><code>test2.ipynb</code></a></li>
+              <li><a href="../examples/origin_story/test2_variant.ipynb"><code>test2_variant.ipynb</code></a></li>
+              <li><a href="../examples/origin_story/README.md"><code>README.md</code></a></li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-band">
+        <div class="container">
+          <h2>What is included</h2>
+          <div class="cards">
+            <article class="item">
+              <h3>Prototype H5</h3>
+              <p>
+                The included H5 uses the early flat schema:
+                <code>src_feature</code>, <code>src_label</code>,
+                <code>tgt_feature</code>, and <code>tgt_label</code>. It is not
+                the dataset-level feature-bank schema used by current configs.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Original notebooks</h3>
+              <p>
+                The notebooks are preserved without cleaning outputs, paths,
+                device choices, or exploratory cells. Some cells may correspond
+                to nearby historical variants rather than the exact included H5.
+              </p>
+            </article>
+            <article class="item">
+              <h3>Diagnostic labels</h3>
+              <p>
+                Target labels in the prototype were used for diagnostic or
+                oracle-style reporting while exploring the idea. They are not a
+                supervised signal in the current benchmark workflow.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>
+          FPS-UDA is released under the MIT License. Feature banks and examples
+          are provided for reproducible research.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
